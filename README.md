@@ -1,2 +1,2 @@
-# demo
-ideathon demo
+# woori-won-ideathon
+woori won banking ideathon
