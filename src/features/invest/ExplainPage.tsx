@@ -30,7 +30,6 @@ export function ExplainPage() {
   return (
     <Screen
       title="핵심 설명"
-      step={4}
       onBack={() => navigate('/navi/invest/profile')}
       footer={
         <PrimaryButton

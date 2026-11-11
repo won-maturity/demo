@@ -23,7 +23,6 @@ export function SummaryPage() {
   return (
     <Screen
       title="만기 상품 요약"
-      step={1}
       onBack={() => navigate('/home')}
       footer={
         <>

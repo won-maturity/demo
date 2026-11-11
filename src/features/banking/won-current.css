@@ -1,0 +1,220 @@
+.won-current-shell { background: #eff1f3; }
+.won-current-header { min-height: 54px; padding: 0 20px; background: #eff1f3; }
+.won-current-header h1 { font-size: 20px; font-weight: 800; }
+.won-current-header .won-header-actions { margin-right: -9px; }
+.won-current-header .won-icon-button { width: 40px; }
+.won-current-header .won-icon-button svg { stroke-width: 2.35; }
+.won-ai-icon { position: relative; display: grid; place-items: center; }
+.won-ai-icon b { position: absolute; top: 4px; left: 5px; font-size: 9px; line-height: 13px; font-weight: 850; }
+.won-ai-icon i, .won-mall-consult i { position: absolute; top: 0; right: -1px; width: 11px; height: 11px; border-radius: 4px; transform: rotate(45deg); background: linear-gradient(130deg,#4dbbff,#5848ef 48%,#a75bf5); box-shadow: inset 2px 1px 1px #c5e7ff66; }
+.won-current-shell .won-current-tabs { min-height: 66px; border: 0; padding: 5px 4px max(7px, env(safe-area-inset-bottom)); background: #eff1f3; }
+.won-current-tabs a { color: #414a52; font-size: 11px; font-weight: 700; gap: 3px; }
+.won-current-tabs a[aria-current] { color: #0967cf; }
+.won-current-tab-icon { display: grid; width: 25px; height: 25px; place-items: center; }
+.won-current-tabs a[aria-current] .won-current-tab-icon { border-radius: 7px; background: #2587ed; color: white; }
+.won-current-tabs a[aria-current] svg { width: 20px; height: 20px; }
+
+.won-current-section { padding: 13px 16px 24px; }
+.won-current-section > h2 { margin: 23px 0 16px; font-size: 19px; font-weight: 770; line-height: 1.3; letter-spacing: -.04em; }
+.won-horizontal { display: flex; min-width: 0; gap: 13px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; scroll-snap-type: x proximity; }
+.won-horizontal > * { flex-shrink: 0; scroll-snap-align: start; }
+.won-current-list { border-radius: 17px; background: white; overflow: hidden; }
+.won-current-service { display: flex; align-items: center; min-height: 83px; gap: 16px; padding: 10px 18px; }
+.won-current-service-icon { display: grid; width: 43px; height: 43px; flex-shrink: 0; place-items: center; border-radius: 50%; background: #edf5fe; color: #2585e7; }
+.won-current-service:nth-child(2n) .won-current-service-icon { background: #edf0ff; color: #534fe0; }
+.won-current-service strong, .won-current-service small, .won-pick strong, .won-pick small { display: block; word-break: keep-all; }
+.won-current-service strong, .won-pick strong { font-size: 16px; font-weight: 730; }
+.won-current-service small, .won-pick small { margin-top: 2px; color: theme('colors.textWeak'); font-size: 13px; font-weight: 570; }
+
+.won-art { display: grid; place-items: center; width: 88px; height: 88px; flex-shrink: 0; color: #4088eb; }
+.won-art::before {
+  content: '';
+  display: block;
+  width: min(100%, var(--won-art-size, 150px));
+  aspect-ratio: 1;
+  max-height: 100%;
+  background-image: url('/won-demo-art.png');
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
+  background-position: var(--won-art-position, 0% 0%);
+}
+.won-art--envelope { --won-art-position: 33.333% 0%; }
+.won-art--house { --won-art-position: 66.666% 0%; }
+.won-art--stock { --won-art-position: 100% 0%; }
+.won-art--presents { --won-art-position: 0% 100%; }
+.won-art--room { --won-art-position: 33.333% 100%; --won-art-size: 105px; }
+.won-art--mobile { --won-art-position: 66.666% 100%; }
+.won-art--pie { --won-art-position: 100% 100%; }
+
+
+.won-carousel { position: relative; overflow: hidden; min-height: 121px; border-radius: 16px; }
+.won-carousel-slide { display: flex; align-items: center; justify-content: space-between; gap: 5px; min-height: 121px; padding: 16px 17px 21px 23px; }
+.won-carousel-slide strong, .won-carousel-slide small { display: block; word-break: keep-all; }
+.won-carousel-slide strong { font-size: 16px; font-weight: 730; line-height: 1.36; letter-spacing: -.034em; }
+.won-carousel-slide small { margin-top: 6px; font-size: 13px; font-weight: 550; line-height: 1.34; }
+.won-carousel-slide .won-art { width: clamp(67px, 24vw, 102px); height: clamp(67px, 24vw, 102px); }
+.won-carousel-controls { position: absolute; display: flex; align-items: center; gap: 4px; right: 12px; bottom: 10px; color: white; }
+.won-carousel-controls div, .won-carousel-controls > button { display: flex; align-items: center; border-radius: 999px; background: #252c33d9; }
+.won-carousel-controls button { display: grid; place-items: center; width: 24px; height: 22px; }
+.won-carousel-controls span { font-size: 11px; font-variant-numeric: tabular-nums; }
+.won-tone--violet { background: linear-gradient(112deg,#a44dec,#8657ea); color: white; }
+.won-tone--cream { background: linear-gradient(115deg,#faead4,#f8f1df); }
+.won-tone--sky { background: #d9effa; }
+.won-tone--lilac { background: #e5edfd; }
+.won-tone--lavender { background: #f3f0fd; }
+
+.won-home-mode { display: flex; align-items: center; padding: 2px; border-radius: 999px; background: #7d858e; }
+.won-home-mode button { min-height: 28px; padding: 0 7px; border-radius: 999px; color: white; font-size: 12px; font-weight: 710; white-space: nowrap; }
+.won-home-mode button[aria-pressed=true] { background: white; color: #414a52; }
+.won-home-accounts { padding: 8px 16px 7px; background: linear-gradient(180deg,#eff1f3 1%,#e1f1fc 18%,#e1f1fc 88%,white); }
+.won-home-promo, .won-home-transfer { position: relative; border-radius: 16px; background: white; }
+.won-home-promo > a, .won-home-transfer > a { display: flex; align-items: center; gap: 12px; min-height: 73px; padding: 10px 30px 10px 16px; }
+.won-home-promo strong, .won-home-transfer strong { font-size: 15px; line-height: 1.42; letter-spacing: -.03em; word-break: keep-all; }
+.won-home-promo-bell, .won-home-kb { display: grid; place-items: center; width: 39px; height: 39px; flex-shrink: 0; border-radius: 11px; background: #fff2ce; color: #d58700; }
+.won-home-promo button, .won-home-transfer button, .won-home-dismiss { position: absolute; top: 5px; right: 6px; display: grid; width: 30px; height: 34px; place-items: center; color: theme('colors.textWeak'); }
+.won-home-scene { position: relative; display: grid; min-height: 109px; justify-items: center; }
+.won-home-scene .won-art { position: absolute; top: 4px; width: 69%; height: 105px; }
+.won-dots { position: absolute; top: 0; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 3px; height: 25px; }
+.won-dots button { display: grid; min-width: 10px; height: 24px; place-items: center; }
+.won-dots button::before { content: ''; width: 6px; height: 6px; border-radius: 999px; background: #768695; }
+.won-dots button[aria-pressed=true]::before { width: 15px; background: #222a31; }
+.won-home-account-tools { position: absolute; inset: auto 0 11px; display: flex; align-items: center; justify-content: space-between; }
+.won-home-account-tools :is(a,button) { display: flex; align-items: center; gap: 5px; min-height: 33px; padding: 0 8px; border-radius: 999px; background: #ffffffe0; color: #4c5862; font-size: 12px; font-weight: 730; }
+.won-home-account-tools i, .won-assets-mini-heading i { position: relative; display: inline-block; width: 26px; height: 15px; border-radius: 999px; background: #7e8892; }
+.won-home-account-tools i::after, .won-assets-mini-heading i::after { content: ''; position: absolute; inset: 2px auto 2px 2px; width: 11px; border-radius: 50%; background: white; }
+.won-home-account-tools button[aria-pressed=true] i { background: #268cf3; }
+.won-home-account-tools button[aria-pressed=true] i::after { left: 13px; }
+.won-current-home--easy .won-home-scene { min-height: 55px; }
+.won-home-transfer { border: 1px solid #a9baff; box-shadow: 0 4px 10px #2c67a822; }
+.won-home-kb { border-radius: 50%; background: #625b4d; color: #ffcb25; font-style: italic; font-weight: 800; }
+.won-home-transfer small { display: flex; align-items: center; gap: 4px; margin-top: 3px; color: #0967cf; font-weight: 690; font-size: 13px; }
+.won-home-connect { position: relative; margin: 12px 0; padding: 12px 8px; border-radius: 17px; background: white; text-align: center; }
+.won-bank-stack { display: flex; justify-content: center; margin-bottom: 9px; }
+.won-bank-stack i { display: grid; place-items: center; width: 31px; aspect-ratio: 1; border-radius: 50%; border: 1px solid white; margin-left: -6px; background: #ffde00; color: #252a31; font-style: normal; font-size: 12px; font-weight: 850; }
+.won-bank-stack i:nth-child(2) { background: #dfedff; color: #2475dc; }
+.won-bank-stack i:nth-child(3) { background: #625b4d; color: #ffce28; }
+.won-bank-stack i:nth-child(4) { background: #008477; color: white; }
+.won-bank-stack i:nth-child(5) { background: #e1e2e3; color: #59616a; }
+.won-home-connect p { font-size: 14px; line-height: 1.42; font-weight: 640; }
+.won-blue-pill { display: inline-grid; min-height: 34px; place-items: center; margin-top: 8px; padding: 0 12px; border-radius: 999px; background: #0967cf; color: white; font-size: 13px; font-weight: 700; }
+.won-current-home .won-account { margin-top: 11px; }
+.won-current-home .won-account-detail { width: fit-content; border-radius: 999px; background: #eef1f3; padding: 2px 7px; margin: 3px 0; }
+.won-home-all { display: grid; place-items: center; min-height: 45px; margin-top: 12px; border-radius: 10px; border: 1px solid #dce0e5; background: white; font-size: 16px; font-weight: 770; }
+.won-home-more { background: white; }
+.won-maturity-entry { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 17px; padding: 11px 16px; border-radius: 13px; background: #e6f1fe; text-align: left; }
+.won-maturity-entry small, .won-maturity-entry strong { display: block; }
+.won-maturity-entry small { font-size: 12px; color: #4a6078; }
+.won-maturity-entry strong { font-size: 16px; color: #0967cf; }
+.won-home-recommend { margin-right: -16px; padding-right: 16px; }
+.won-home-recommend > div { width: 81%; border-radius: 16px; padding: 9px 0; background: #f6edfa; }
+.won-home-recommend > div:nth-child(2) { background: #e4edfd; }
+.won-home-recommend .won-current-service { min-height: 71px; padding-inline: 14px; gap: 10px; }
+.won-home-recommend .won-current-service-icon { background: white; }
+.won-home-group { margin-right: -16px; }
+.won-home-group a { width: 39%; min-height: 110px; padding: 15px; border: 1px solid #dbe0e5; border-radius: 19px; }
+.won-home-group strong, .won-home-group span { display: block; }
+.won-home-group strong { margin-bottom: 4px; font-size: 17px; color: #8636ab; }
+.won-home-group a:nth-child(2) strong { color: #087a62; }
+.won-home-group a:nth-child(3) strong { color: #1264bd; }
+.won-home-group span { font-size: 14px; color: theme('colors.textWeak'); }
+.won-home-explore { background: #eff1f3; }
+.won-product-peek { margin-right: -16px; }
+.won-product-peek a { position: relative; width: 54%; min-height: 235px; padding: 16px; border-radius: 16px; background: #177f98; color: white; }
+.won-product-peek a:nth-child(2) { background: #583ee1; }
+.won-product-peek small, .won-product-peek strong { display: block; word-break: keep-all; }
+.won-product-peek small { font-size: 13px; }
+.won-product-peek strong { font-size: 15px; margin-top: 4px; }
+.won-product-peek .won-art { position: absolute; inset: auto 13% 15%; width: 74%; height: 105px; --won-art-size: 105px; }
+
+.won-mall-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px 4px; margin-top: 39px; padding: 24px 8px 27px; border-radius: 17px; background: white; }
+.won-mall-grid a { display: grid; gap: 4px; justify-items: center; align-content: start; text-align: center; }
+.won-mall-grid strong { font-size: 14px; font-weight: 750; letter-spacing: -.025em; word-break: keep-all; }
+.won-product-icon { display: grid; place-items: center; width: 52px; aspect-ratio: 1; border-radius: 13px; background: #f4f6f7; color: #2183dc; }
+.won-product-icon svg { fill: currentColor; fill-opacity: .18; }
+.won-product-icon--pink { color: #df5496; }.won-product-icon--purple { color: #aa54db; }.won-product-icon--indigo { color: #6a51e7; }.won-product-icon--brown { color: #a36c57; }.won-product-icon--cyan { color: #1786a4; }.won-product-icon--mint { color: #00866b; }.won-product-icon--gold { color: #c08000; }.won-product-icon--magenta { color: #ba3aa1; }
+.won-mall-group { position: relative; display: flex; align-items: center; gap: 14px; min-height: 85px; margin-top: 13px; padding: 14px 19px; border-radius: 17px; background: white; }
+.won-mall-group > span:nth-last-child(2) { flex: 1; min-width: 0; }
+.won-mall-group strong, .won-mall-group small { display: block; }
+.won-mall-group strong { font-size: 17px; }.won-mall-group small { font-size: 13px; color: theme('colors.textWeak'); }
+.won-mall-group > svg:first-of-type { flex-shrink: 0; color: #575be3; }
+.won-group-tip { position: absolute; right: 8px; top: -8px; padding: 4px 7px; border-radius: 5px; background: #0967cf; color: white; font-size: 10px; font-weight: 720; }
+.won-mall-consult { margin-top: 12px; padding: 16px 18px; border-radius: 17px; background: white; }
+.won-mall-consult h2 { font-size: 17px; font-weight: 770; }
+.won-mall-consult em { color: #184ad5; font-style: normal; }
+.won-mall-consult > div { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 9px; }
+.won-mall-consult a { position: relative; display: inline-grid; min-height: 34px; place-items: center; padding: 0 7px 0 21px; border: 1px solid #dbe0e5; border-radius: 999px; font-size: 12px; font-weight: 710; }
+.won-mall-consult i { top: 12px; left: 8px; width: 9px; height: 9px; }
+.won-mall-picks { background: white; }
+.won-pick { display: flex; align-items: center; justify-content: space-between; min-height: 103px; margin-bottom: 12px; padding: 10px 13px 10px 20px; border-radius: 16px; }
+.won-pick .won-art { width: 63px; height: 63px; }
+.won-mall-picks .won-current-list { margin-top: 14px; }
+
+.won-current-assets { background: linear-gradient(#eff1f3 5%,#e3f3fe 75%,#eff5fa); }
+.won-assets-connect-small { padding: 7px 9px; border-radius: 999px; background: #e4e7eb; font-size: 12px; font-weight: 740; white-space: nowrap; }
+.won-assets-hero, .won-assets-compare { padding: 22px 10px 23px; border-radius: 17px; text-align: center; }
+.won-assets-hero { border: 1px solid #e5ebf5; background: linear-gradient(white,#e2f1fc); box-shadow: 0 8px 21px #305f9422; }
+.won-assets-hero > p { color: theme('colors.textWeak'); font-size: 13px; font-weight: 600; word-break: keep-all; }
+.won-assets-hero h2, .won-assets-compare h2 { margin-top: 3px; font-size: 20px; font-weight: 790; line-height: 1.37; letter-spacing: -.045em; word-break: keep-all; }
+.won-assets-mini { width: min(82%,197px); margin: 24px auto 18px; padding: 10px 9px 0; overflow: hidden; border: 5px solid #f4f6f8; border-radius: 26px 26px 12px 12px; background: white; box-shadow: 0 4px 22px #a6b0fc55; text-align: left; }
+.won-assets-mini-heading, .won-assets-mini-heading span:nth-child(2), .won-assets-mini-total { display: flex; align-items: center; justify-content: space-between; gap: 3px; }
+.won-assets-mini-heading { color: theme('colors.textWeak'); font-size: 8px; font-weight: 700; }
+.won-assets-mini-heading i { width: 14px; height: 9px; }
+.won-assets-mini-heading i::after { width: 5px; }
+.won-assets-mini-total { padding: 5px 0 12px; }
+.won-assets-mini-total > i { display: grid; place-items: center; width: 14px; aspect-ratio: 1; border-radius: 50%; background: #fdba13; color: #403400; font-size: 8px; font-style: normal; }
+.won-assets-mini-total strong { flex: 1; font-size: 14px; }
+.won-assets-mini em { color: #6747de; font-style: normal; }
+.won-assets-mini dl > div, .won-assets-mini dd { display: flex; align-items: center; justify-content: space-between; gap: 3px; }
+.won-assets-mini dl > div { min-height: 22px; font-size: 8px; font-weight: 660; white-space: nowrap; }
+.won-assets-mini dt small { display: inline-block; padding: 1px 3px; margin-left: 2px; border-radius: 999px; background: #eef1f3; font-size: 6px; }
+.won-assets-mini-note { margin: 5px -9px 0; padding: 5px 3px; background: linear-gradient(#8540e5,#ba99ed); color: white; text-align: center; font-size: 8px; font-weight: 700; }
+.won-assets-link { display: inline-grid; min-height: 42px; place-items: center; padding: 0 13px; border-radius: 999px; background: #e0e3fa; color: #333dbb; font-size: 14px; font-weight: 730; }
+.won-assets-compare { margin-top: 24px; background: white; }
+.won-assets-gauge { position: relative; width: min(84%,220px); margin: 17px auto 0; }
+.won-assets-gauge svg { display: block; width: 100%; }
+.won-assets-gauge > div { position: absolute; inset: 49% 0 0; }
+.won-assets-gauge small, .won-assets-gauge strong { display: block; }
+.won-assets-gauge small { display: inline-block; padding: 3px 6px; border-radius: 999px; background: #eef1f3; font-size: 10px; font-weight: 700; }
+.won-assets-gauge strong { font-size: 18px; }
+.won-assets-compare-link { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 38px; color: #0967cf; font-size: 14px; font-weight: 730; }
+.won-assets-shortcuts { display: grid; gap: 7px; margin-top: 14px; }
+.won-assets-shortcuts a { display: flex; align-items: center; justify-content: space-between; min-height: 45px; padding: 0 14px; border-radius: 12px; background: white; font-weight: 700; }
+
+.won-stocks .won-horizontal { margin-right: -16px; gap: 4px; }
+.won-stock-indices > div { display: grid; align-content: center; width: 92px; min-height: 95px; gap: 3px; padding: 10px 12px; border-radius: 13px; background: white; }
+.won-stock-indices small { color: theme('colors.textWeak'); font-size: 11px; white-space: nowrap; }
+.won-stock-indices strong { font-size: 14px; white-space: nowrap; }
+.won-stock-indices div > span { width: fit-content; padding: 3px 4px; border-radius: 6px; font-size: 13px; font-weight: 720; white-space: nowrap; }
+.won-up { background: #fcebec; color: #bd2027; }.won-down { background: #e2f1fc; color: #0967cf; }
+.won-stock-start { display: grid; justify-items: center; margin: 20px 0 39px; padding: 27px 17px 20px; border-radius: 17px; background: white; text-align: center; }
+.won-stock-start p { color: #0967cf; font-size: 14px; font-weight: 700; }.won-stock-start h2 { font-size: 20px; font-weight: 790; letter-spacing: -.04em; }
+.won-stock-start .won-art { width: 105px; height: 105px; margin: 16px 0; }
+.won-current-primary { display: grid; width: 100%; min-height: 43px; place-items: center; padding: 5px 9px; border-radius: 10px; background: #0967cf; color: white; font-weight: 730; font-size: 15px; }
+.won-current-search { display: flex; align-items: center; min-height: 47px; gap: 10px; border-radius: 11px; padding: 0 14px; background: white; }
+.won-current-search input { flex: 1; min-width: 0; min-height: 40px; background: transparent; font-size: 15px; font-weight: 560; }
+.won-current-search input::placeholder { color: theme('colors.textWeak'); }
+.won-stocks .won-current-search { margin: 19px 0 14px; }
+.won-stock-results > :is(a,p) { display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 0 14px; font-weight: 650; }
+
+.won-current-menu { background: white; }
+.won-current-menu-top { padding: 0 20px 18px; border-bottom: 8px solid #f5f6f7; }
+.won-current-menu-heading { display: flex; align-items: center; gap: 9px; min-height: 53px; }
+.won-current-menu-heading > a { display: grid; min-height: 44px; place-items: center; }
+.won-current-menu-heading h1 { font-size: 21px; font-weight: 800; text-decoration: underline; text-underline-offset: 5px; }
+.won-current-menu .won-current-search { margin: 8px 0 12px; background: #eff1f3; }
+.won-current-menu-quick { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 2px; }
+.won-current-menu-quick a { display: grid; justify-items: center; gap: 7px; padding: 6px 0; font-size: 11px; font-weight: 730; white-space: nowrap; }
+.won-current-menu-quick svg { color: #257eeb; fill: currentColor; fill-opacity: .18; }.won-current-menu-quick a:nth-child(2) svg { color: #23859b; }.won-current-menu-quick a:nth-child(3) svg { color: #765ac6; }.won-current-menu-quick a:nth-child(4) svg { color: #687e9f; }
+.won-current-menu-list { padding: 0 20px 18px; }
+.won-current-menu-list section { padding: 28px 0 20px; border-bottom: 1px solid #e9edf0; }
+.won-current-menu-list h2 { display: flex; align-items: center; gap: 6px; color: theme('colors.textWeak'); font-size: 14px; font-weight: 730; }
+.won-current-menu-list h2 svg { color: #2687ee; }
+.won-current-menu-list ul { margin: 9px 0 0 24px; }
+.won-current-menu-list li a { display: flex; align-items: center; min-height: 46px; font-size: 16px; font-weight: 690; }
+
+@media(max-width: 350px) {
+  .won-current-header { padding-inline: 13px; }.won-current-header .won-icon-button { width: 34px; }
+  .won-current-section, .won-home-accounts { padding-inline: 12px; }
+  .won-carousel-slide { padding-left: 15px; }.won-carousel-slide strong { font-size: 14px; }
+  .won-home-recommend, .won-product-peek, .won-home-group, .won-stocks .won-horizontal { margin-right: -12px; }
+}

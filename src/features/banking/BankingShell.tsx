@@ -23,9 +23,9 @@ export function useOpenMaturity() {
 
 export function BankingShell() {
   const { pathname } = useLocation();
-  const showNavigation = ['/home', '/assets', '/banking', '/benefits', '/menu', '/spending', '/notifications'].includes(pathname);
+  const showNavigation = ['/home', '/assets', '/banking', '/stocks', '/benefits', '/spending'].includes(pathname);
   return (
-    <div className="won-shell">
+    <div className={showNavigation ? "won-shell won-current-shell" : "won-shell"}>
       <Outlet />
       {showNavigation && <BottomTabBar />}
     </div>

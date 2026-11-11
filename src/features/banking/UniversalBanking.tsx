@@ -73,12 +73,12 @@ const cardTitles = { statement: '이용대금명세서', payment: '즉시결제'
 
 export function CardDetailsPage() {
   const { view } = useParams();
-  if (view !== 'statement' && view !== 'payment' && view !== 'rewards') return <Navigate to="/banking" replace />;
+  if (view !== 'statement' && view !== 'payment' && view !== 'rewards') return <Navigate to="/banking/universal" replace />;
   const rewards = view === 'rewards';
 
   return (
     <>
-      <BankingHeader title={cardTitles[view]} backTo="/banking" centered />
+      <BankingHeader title={cardTitles[view]} backTo="/banking/universal" centered />
       <main className="won-scroll won-page">
         <section className="won-panel won-account-info">
           <h2>{rewards ? '10월 카드 혜택' : '1월 결제 예정 금액'}</h2>

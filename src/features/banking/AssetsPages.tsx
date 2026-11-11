@@ -10,7 +10,7 @@ export function AssetsPage() {
   const { persona } = useBankingCustomer();
   return (
     <>
-      <BankingHeader title="자산" />
+      <BankingHeader title="전체계좌조회" backTo="/assets" centered />
       <main className="won-scroll won-page">
         <div className="won-section-heading">
           <h2>전체 계좌</h2>
@@ -34,12 +34,12 @@ export function AccountPage() {
   const openMaturity = useOpenMaturity();
   const account = getAccounts(persona).find((item) => item.id === accountId);
 
-  if (!account) return <Navigate to="/assets" replace />;
+  if (!account) return <Navigate to="/assets/accounts" replace />;
   const actionView = params.get('action') === '1' && ['이체', '추가입금'].includes(account.action);
 
   return (
     <>
-      <BankingHeader title={actionView ? account.action : '계좌 상세'} backTo={actionView ? `/assets/accounts/${account.id}` : '/assets'} centered />
+      <BankingHeader title={actionView ? account.action : '계좌 상세'} backTo={actionView ? `/assets/accounts/${account.id}` : '/assets/accounts'} centered />
       <main className="won-scroll won-page">
         <section className="won-panel won-account-info">
           <BankMark brand={account.brand} />

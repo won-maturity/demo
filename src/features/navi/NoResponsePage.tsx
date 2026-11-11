@@ -45,7 +45,6 @@ export function NoResponsePage() {
   return (
     <Screen
       title="무응답 시뮬레이션"
-      step={1}
       onBack={() => navigate(location.state?.fromSummary && persona ? '/navi/summary' : location.state?.fromDemo ? '/demo' : '/menu')}
       footer={
         <>

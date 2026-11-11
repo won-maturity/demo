@@ -1,0 +1,70 @@
+.won-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  color: theme('colors.textStrong');
+  background: #f5f6f7;
+}
+.won-chat-header {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  min-height: 54px;
+  padding: 0 15px;
+  background: white;
+  text-align: center;
+}
+.won-chat-header h1 { font-size: 17px; font-weight: 750; letter-spacing: -.04em; }
+.won-chat-header button { display: grid; place-items: center; min-height: 44px; justify-self: start; }
+.won-chat-orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  width: 40px;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: linear-gradient(130deg, #8253ff, #3b86ed);
+}
+.won-chat-orb::before, .won-chat-orb::after {
+  position: absolute;
+  width: 52%;
+  height: 73%;
+  border-radius: 50%;
+  background: #eff5ff78;
+  content: '';
+}
+.won-chat-orb::after { transform: rotate(75deg); opacity: .54; }
+.won-chat-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 4px 0 6px; background: white; }
+.won-chat-tools button { position: relative; display: flex; justify-content: center; align-items: center; min-height: 45px; gap: 5px; font-size: 13px; font-weight: 650; color: theme('colors.textWeak'); white-space: nowrap; }
+.won-chat-tools button + button::before { position: absolute; inset: 12px auto 12px 0; border-left: 1px solid theme('colors.line'); content: ''; }
+.won-chat-feed { min-height: 0; min-width: 0; flex: 1; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; padding: 28px 20px 18px; }
+.won-chat-date { display: flex; align-items: center; gap: 14px; color: theme('colors.textWeak'); font-size: 12px; font-weight: 650; }
+.won-chat-date::before, .won-chat-date::after { content: ''; flex: 1; height: 1px; background: theme('colors.line'); }
+.won-chat-connected { display: flex; width: fit-content; max-width: 100%; align-items: center; gap: 5px; margin: 16px auto 23px; padding: 4px 9px; border-radius: 999px; background: #e9edf0; color: theme('colors.textWeak'); font-size: 12px; font-weight: 700; }
+.won-chat-connected::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: theme('colors.visualBlue'); }
+.won-chat-bot { display: grid; width: 34px; aspect-ratio: 1; place-items: center; border-radius: 50%; background: #e1efff; color: #2c62dd; }
+.won-chat-greeting h2 { margin: 10px 0 12px; font-size: clamp(20px, 5.4vw, 23px); font-weight: 790; line-height: 1.36; letter-spacing: -.044em; word-break: keep-all; }
+.won-chat-greeting p { font-size: 15px; font-weight: 670; line-height: 1.45; }
+.won-chat-messages { display: grid; gap: 9px; margin: 13px 0; }
+.won-chat-message { max-width: 92%; padding: 10px 13px; border-radius: 15px; font-size: 14px; line-height: 1.53; overflow-wrap: anywhere; }
+.won-chat-message--ai { justify-self: start; border-top-left-radius: 4px; background: white; }
+.won-chat-message--user { justify-self: end; border-top-right-radius: 4px; background: #e3edfd; }
+.won-chat-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.won-chat-chips button { min-height: 34px; border: 0; background: #e4edfc; color: #38444e; font-size: 13px; }
+.won-chat-guide { display: grid; gap: 7px; margin-top: 17px; border-radius: 20px; background: white; padding: 20px; box-shadow: 0 2px 3px #29385013; }
+.won-chat-guide h3 { font-weight: 760; font-size: 17px; line-height: 1.4; }
+.won-chat-guide em { font-style: normal; color: theme('colors.primary'); }
+.won-chat-guide p { font-size: 13px; }
+.won-chat-guide .won-art { width: 75px; height: 75px; justify-self: end; }
+.won-chat-footer { padding: 8px 17px max(12px, env(safe-area-inset-bottom)); background: white; }
+.won-chat-examples { margin-bottom: 8px; }
+.won-chat-composer, .won-chat-composer > div { display: flex; align-items: center; gap: 5px; }
+.won-chat-composer > div { flex: 1; min-width: 0; border-radius: 9px; background: #eff1f3; }
+.won-chat-composer button { display: grid; place-items: center; width: 36px; min-height: 44px; flex-shrink: 0; color: theme('colors.textWeak'); }
+.won-chat-composer button[type=submit] { color: theme('colors.primary'); }
+.won-chat-composer button:disabled { color: theme('colors.textWeak'); }
+.won-chat-composer input { flex: 1; min-width: 0; min-height: 44px; padding-left: 12px; border-radius: 9px; background: transparent; font-size: 14px; }
+.won-chat-composer input::placeholder { color: theme('colors.textWeak'); }
+.won-chat :is(button, input):focus-visible { outline: 2px solid theme('colors.primary'); outline-offset: -2px; }

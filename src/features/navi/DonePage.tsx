@@ -101,7 +101,6 @@ export function DonePage() {
   return (
     <Screen
       title="완료와 기록"
-      step={5}
       onBack={() => navigate('/home')}
       footer={<SecondaryButton onClick={() => navigate('/demo')}>다른 고객 시연</SecondaryButton>}
     >

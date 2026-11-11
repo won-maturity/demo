@@ -31,7 +31,6 @@ export function ProfilePage() {
   return (
     <Screen
       title="투자성향"
-      step={4}
       onBack={() => navigate('/navi/options')}
       footer={
         <PrimaryButton
