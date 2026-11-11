@@ -1,30 +1,27 @@
 import { useNavigate } from 'react-router-dom';
-import { ExampleValue } from '../../components/ui/AmountText';
 import { Card } from '../../components/ui/Card';
 import { PrimaryButton } from '../../components/ui/Buttons';
 import { Screen } from '../../components/ui/Screen';
-import { formatManWon } from '../../lib/format';
-import { getPersona } from '../../mock/personas';
-import { getProduct, INVEST_ID } from '../../mock/products';
+import { OfficialProductSource } from '../../components/ui/OfficialProductSource';
+import { getProduct } from '../../mock/products';
 import { useDemoStore } from '../../store/useDemoStore';
 
 const rows = [
   { key: 'loss' as const, label: '원금 손실이 날 수 있어요' },
   { key: 'protect' as const, label: '예금자보호가 적용되지 않아요' },
-  { key: 'fee' as const, label: '수수료가 있어요' },
+  { key: 'fee' as const, label: '보수·수수료 조건을 확인했어요' },
 ];
 
 export function ExplainPage() {
   const navigate = useNavigate();
   const personaId = useDemoStore((state) => state.personaId);
+  const selectedProductId = useDemoStore((state) => state.selectedProductId);
   const checked = useDemoStore((state) => state.explainChecked);
   const toggleExplain = useDemoStore((state) => state.toggleExplain);
   const markInvest = useDemoStore((state) => state.markInvest);
   const addConsent = useDemoStore((state) => state.addConsent);
   if (!personaId) return null;
-  const persona = getPersona(personaId);
-  const product = getProduct(INVEST_ID);
-  const worst = product.worstLossRate ?? 0;
+  const product = getProduct(selectedProductId);
   const ready = rows.every((row) => checked[row.key]);
 
   return (
@@ -49,22 +46,12 @@ export function ExplainPage() {
       </div>
       <Card className="mt-3">
         <h2 className="text-lg font-bold text-textStrong">{product.name}</h2>
-        <p className="mt-2 text-sm leading-6 text-textBody">
-          1,000만 원을 넣으면 과거 기준 최악의 경우 약{' '}
-          <ExampleValue>{formatManWon(Math.round(10_000_000 * worst))}</ExampleValue> 손실
-        </p>
-        <div className="mt-1">
-          <ExampleValue>{`손실률 ${Math.round(worst * 100)}%`}</ExampleValue>
-        </div>
-        <p className="mt-3 text-sm leading-6 text-textBody">
-          {persona.name}님 원금 기준으로는 약{' '}
-          <ExampleValue>{formatManWon(Math.round(persona.principal * worst))}</ExampleValue>까지 줄 수 있어요.
-        </p>
-        <p className="mt-3 text-sm text-textBody">
-          연 수수료 <ExampleValue>{`연 ${((product.feeRate ?? 0) * 100).toFixed(2)}%`}</ExampleValue>
-          {' · 약 '}
-          <ExampleValue>{formatManWon(Math.round(persona.principal * (product.feeRate ?? 0)))}</ExampleValue>
-        </p>
+        {product.provider && <p className="text-sm text-textBody">연결 서비스 · {product.provider}</p>}
+        <p className="mt-2 text-sm leading-6 text-textBody">{product.summary}</p>
+        <p className="mt-3 text-sm leading-6 text-textBody">원금의 일부 또는 전부를 잃을 수 있어요. 손실 한도나 미래 수익률을 약속하는 상품이 아니에요.</p>
+        <p className="mt-3 text-sm leading-6 text-textBody">{product.feeText}</p>
+        <OfficialProductSource url={product.officialUrl} provider={product.provider} checkedAt={product.officialCheckedAt} />
+        <p className="mt-3 text-xs leading-5 text-textBody">이후 이해도 확인과 다음 날 승인은 데모의 시연 절차예요. 실제 가입·매매 조건은 해당 금융회사에서 확인해 주세요.</p>
       </Card>
       <p className="mb-2 mt-4 text-sm font-bold text-textStrong">확인하고 체크해 주세요</p>
       <div className="space-y-2">

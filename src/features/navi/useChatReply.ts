@@ -110,7 +110,12 @@ export function useChatReply() {
     const complete = () => {
       if (request !== generation.current || before.messages[0] !== useDemoStore.getState().messages[0]) return;
       const after = useDemoStore.getState();
-      if (waiting.messages === after.messages && waiting.chatStep === after.chatStep && waiting.interpret === after.interpret) {
+      const lastLookupIndex = after.messages.map((message) => Boolean(message.kind)).lastIndexOf(true);
+      const playbackStart = result && lastLookupIndex >= waiting.messages.length - 1
+        ? { ...waiting, messages: after.messages.slice(0, lastLookupIndex + 1) }
+        : waiting;
+      if (playbackStart.messages.length === after.messages.length
+        && playbackStart.messages.every((message, index) => message === after.messages[index]) && playbackStart.chatStep === after.chatStep && playbackStart.interpret === after.interpret) {
         busy.current = false;
         setView(null);
         setIsReplying(false);
@@ -118,7 +123,7 @@ export function useChatReply() {
       }
       cancelPlayback.current?.();
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      cancelPlayback.current = playChatReply(waiting, after, (nextView, replying) => {
+      cancelPlayback.current = playChatReply(playbackStart, after, (nextView, replying) => {
         busy.current = replying;
         setView(replying ? nextView : null);
         setIsReplying(replying);

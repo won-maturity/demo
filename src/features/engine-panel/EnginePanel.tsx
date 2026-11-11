@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { ExampleBadge } from '../../components/ui/Badge';
 import { buildEngineSnapshot } from '../../engine/rules';
 import { getPersona } from '../../mock/personas';
-import { INVEST_ID, PIPELINE_PRODUCT, REDEPOSIT_ID } from '../../mock/products';
+import { PIPELINE_PRODUCT, REDEPOSIT_ID } from '../../mock/products';
 import { sameQuestionFailCount, useDemoStore } from '../../store/useDemoStore';
 
 export function EnginePanel() {
@@ -87,7 +87,6 @@ export function EnginePanel() {
               </Block>
               <Block title="적합도 추천">
                 {snapshot.scores
-                  .filter((score) => (personaId !== 'A' && personaId !== 'D') || score.productId !== INVEST_ID)
                   .map((score) => (
                   <p key={score.productId}>
                     {score.name} {score.score}점{score.excluded ? ` · 제외 · ${score.reason}` : ''}

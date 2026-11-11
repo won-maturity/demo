@@ -12,11 +12,12 @@ import {
   predictChurn,
 } from './rules';
 import { getPersona } from '../mock/personas';
-import { INVEST_ID, REDEPOSIT_ID } from '../mock/products';
+import { ETF_PORTFOLIO_ID, INVEST_ID, REDEPOSIT_ID } from '../mock/products';
 
 const personaA = getPersona('A');
 const personaB = getPersona('B');
 const personaC = getPersona('C');
+const personaD = getPersona('D');
 
 describe('estimateHorizon', () => {
   it('maps timing chips to a horizon and keeps a real use date', () => {
@@ -59,7 +60,7 @@ describe('RULE_SHORT_TERM_NO_INVEST', () => {
 
 describe('RULE_SUITABILITY_ONLY', () => {
   it('hides investment from a conservative customer even on a long horizon', () => {
-    const { options, excluded, appliedRules } = getEligibleOptions(personaA, 'LONG');
+    const { options, excluded, appliedRules } = getEligibleOptions(personaB, 'LONG');
     expect(options.some((option) => option.kind === 'invest')).toBe(false);
     expect(excluded.find((item) => item.productId === INVEST_ID)?.reason).toContain('안정형');
     expect(appliedRules).toContain('RULE_SUITABILITY_ONLY');
@@ -72,9 +73,46 @@ describe('RULE_SUITABILITY_ONLY', () => {
   });
 
   it('shows an investment option only to a suitable long-horizon customer', () => {
-    const { options, appliedRules } = getEligibleOptions(personaB, 'LONG');
-    expect(options.some((option) => option.productId === INVEST_ID)).toBe(true);
+    const { options, appliedRules } = getEligibleOptions(personaA, 'LONG');
+    expect(options.some((option) => option.productId === ETF_PORTFOLIO_ID && option.provider === '우리자산운용')).toBe(true);
     expect(appliedRules).toContain('RULE_COOLING_OFF');
+  });
+});
+
+describe('official affiliate choices', () => {
+  it('offers securities and asset management alternatives with official sources for an aggressive investor', () => {
+    for (const horizon of ['MID', 'LONG'] as const) {
+      const result = getEligibleOptions(personaA, horizon);
+      expect(result.options.map((option) => option.productId)).toEqual([REDEPOSIT_ID, INVEST_ID, ETF_PORTFOLIO_ID]);
+      const affiliates = result.options.filter((option) => option.kind === 'invest');
+      expect(affiliates.map((option) => option.provider)).toEqual(['우리투자증권', '우리자산운용']);
+      expect(affiliates.every((option) => !option.isExample && option.officialUrl?.startsWith('https://') && option.officialCheckedAt)).toBe(true);
+      expect(affiliates.find((option) => option.productId === ETF_PORTFOLIO_ID)?.ticker).toBe('444490');
+      expect(affiliates.every((option) => !option.principalGuaranteed && option.annualRate === null)).toBe(true);
+      expect(result.excluded.some((option) => affiliates.some((shown) => shown.productId === option.productId))).toBe(false);
+    }
+  });
+
+  it('limits a stability-seeking investor to RP rather than the equity ETF', () => {
+    const result = getEligibleOptions({ ...personaA, riskProfile: '안정추구형' }, 'LONG');
+    expect(result.options.some((option) => option.productId === INVEST_ID)).toBe(true);
+    expect(result.options.some((option) => option.productId === ETF_PORTFOLIO_ID)).toBe(false);
+  });
+});
+
+describe('investment preference', () => {
+  it('excludes investments for Yang even if a stored risk profile would otherwise permit them', () => {
+    const result = getEligibleOptions({ ...personaD, riskProfile: '적극투자형' }, 'LONG');
+    expect(result.options.some((option) => option.kind === 'invest')).toBe(false);
+    expect(result.appliedRules).toContain('RULE_NO_INVESTMENT_PREFERENCE');
+    expect(result.excluded.find((item) => item.productId === ETF_PORTFOLIO_ID)?.reason).toContain('원하지');
+    expect(result.decision).toContain('예금만');
+  });
+
+  it('keeps short-term and unknown use dates out of investment even for an aggressive investor', () => {
+    for (const horizon of ['SHORT', 'UNKNOWN'] as const) {
+      expect(getEligibleOptions(personaA, horizon).options.some((option) => option.kind === 'invest')).toBe(false);
+    }
   });
 });
 
@@ -139,13 +177,13 @@ describe('predictChurn and fit scores', () => {
 describe('option bounds', () => {
   it('keeps redeposit first and caps every persona and horizon at 3 cards', () => {
     const horizons = ['SHORT', 'MID', 'LONG', 'UNKNOWN'] as const;
-    for (const persona of [personaA, personaB, personaC]) {
+    for (const persona of [personaA, personaB, personaC, personaD]) {
       for (const horizon of horizons) {
         const { options } = getEligibleOptions(persona, horizon, '2027-05-20');
         expect(options[0]?.kind).toBe('redeposit');
         expect(options.length).toBeGreaterThan(0);
         expect(options.length).toBeLessThanOrEqual(3);
-        if (persona.id === 'A') {
+        if (persona.investmentPreference === 'declines' || persona.riskProfile === '안정형') {
           expect(options.some((option) => option.kind === 'invest')).toBe(false);
         }
       }

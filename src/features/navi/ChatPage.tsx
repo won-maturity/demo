@@ -48,7 +48,7 @@ export function ChatPage() {
   const maturityLookup = useDemoStore((state) => state.maturityLookup);
   const investmentLookup = useDemoStore((state) => state.investmentLookup);
   const maturityEntry = state?.fromMaturity === true || messages.some((message) => message.kind === 'maturity-lookup');
-  const [draft, setDraft] = useState('');
+  const [draft, setDraft] = useState(() => typeof state?.draft === 'string' ? state.draft : '');
   const [pickingIndex, setPickingIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -142,7 +142,10 @@ export function ChatPage() {
       <header className="won-chat-header">
         <button type="button" onClick={() => navigate(backTo)} aria-label="뒤로 가기"><ChevronLeft size={26} /></button>
         <h1>AI챗봇과 대화중</h1>
-        <span className="won-chat-orb" aria-hidden />
+        <button type="button" className="won-chat-gallery-trigger" aria-label="AI갤러리 열기"
+          onClick={() => navigate('/ai-gallery', { state: { returnTo: '/navi/chat', returnState: { ...state, draft } } })}>
+          <span className="won-chat-orb" aria-hidden="true" />
+        </button>
       </header>
       <nav className="won-chat-tools" aria-label="상담 메뉴">
         <button type="button" onClick={() => navigate('/navi/handoff')}><MessagesSquare size={17} aria-hidden />톡상담</button>
@@ -173,7 +176,9 @@ export function ChatPage() {
             <BankLookupCard key={message.id} type={message.kind === 'maturity-lookup' ? 'maturity' : 'investment'}
               onRetry={() => reply(message.kind === 'maturity-lookup'
                 ? useDemoStore.getState().startMaturityChat
-                : useDemoStore.getState().prepareChatOptions)} />
+                : Object.values(useDemoStore.getState().answers).some(Boolean) || useDemoStore.getState().intentConfirmed
+                  ? useDemoStore.getState().prepareChatOptions
+                  : useDemoStore.getState().startMaturityChat)} />
           ) : <ChatBubble key={message.id} role={message.role}>{message.text}</ChatBubble>)}
           {chatStep === 'interpret' && interpret && (
             <fieldset disabled={blocked} className="min-w-0">
@@ -202,7 +207,7 @@ export function ChatPage() {
             {chatStep === 'timing' && TIMING_CHIPS.map((chip) => <Chip key={chip.id} label={chip.label} onClick={() => onTiming(chip.id as TimingId)} />)}
             {chatStep === 'purpose' && PURPOSE_CHIPS.map((chip) => <Chip key={chip.id} label={chip.label} onClick={() => onPurpose(chip.id as PurposeId)} />)}
             {chatStep === 'date' && DATE_CHIPS.map((chip) => <Chip key={chip.id} label={chip.label} onClick={() => onDate(chip.id)} />)}
-            {persona.id !== 'A' && persona.id !== 'D' && chatStep !== 'date' && <Chip label="투자 상품이 궁금해요" onClick={askInvest} />}
+            {persona.investmentPreference !== 'declines' && chatStep !== 'date' && <Chip label="투자 상품이 궁금해요" onClick={askInvest} />}
           </fieldset>
         )}
         {!maturityEntry && !isReplying && chatStep === 'timing' && messages.length <= 2 && (

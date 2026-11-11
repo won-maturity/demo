@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { AmountText, ExampleValue } from '../../components/ui/AmountText';
 import { Badge } from '../../components/ui/Badge';
 import { BottomSheet } from '../../components/ui/BottomSheet';
+import { OfficialProductSource } from '../../components/ui/OfficialProductSource';
 import { Card } from '../../components/ui/Card';
 import { ChatBubble } from '../../components/ui/ChatBubble';
 import { PrimaryButton } from '../../components/ui/Buttons';
@@ -187,12 +188,13 @@ export function OptionsPage() {
                     <span className="flex flex-wrap items-center gap-1.5">
                       <span className="text-[16px] font-bold text-textStrong">{option.name}</span>
                       {option.kind === 'redeposit' ? <Badge tone="safe">기본</Badge> : null}
+                      {option.provider && <Badge tone="neutral">{option.provider}</Badge>}
                     </span>
                     <span className="mt-1 block text-sm leading-6 text-textBody">
                       {checked ? option.guide : option.summary}
                     </span>
                     <span className="mt-2 flex flex-wrap items-center gap-1.5">
-                      <ExampleValue>{option.rateText}</ExampleValue>
+                      {option.isExample ? <ExampleValue>{option.rateText}</ExampleValue> : <span className="text-sm font-semibold text-textStrong">{option.rateText}</span>}
                       <Badge tone={option.principalGuaranteed ? 'safe' : 'danger'}>
                         {option.principalGuaranteed ? '원금보장' : '원금비보장'}
                       </Badge>
@@ -201,6 +203,8 @@ export function OptionsPage() {
                     <span className="mt-2 block text-[13px] font-semibold text-primary">절차 · {option.procedure}</span>
                   </span>
                 </button>
+                {option.ticker && <p className="mt-2 text-xs text-textBody">ETF 종목코드 {option.ticker}</p>}
+                <OfficialProductSource url={option.officialUrl} provider={option.provider} checkedAt={option.officialCheckedAt} />
                 <button
                   type="button"
                   onClick={() => setWhy(option)}
@@ -213,6 +217,16 @@ export function OptionsPage() {
           );
         })}
       </div>
+      <Link to="/banking/affiliates" className="mt-4 flex min-h-tap items-center justify-between rounded-card bg-surface px-4 py-3 text-sm font-semibold text-primary">
+        우리금융 계열사 상품 살펴보기 <span aria-hidden>→</span>
+      </Link>
+      <p className="mt-2 text-xs leading-5 text-textBody">{persona.investmentPreference === 'declines'
+        ? '투자를 원하지 않는 등록 의사에 따라 추천 목록에는 예금만 담았어요.'
+        : persona.riskProfile === '안정형' || persona.riskProfile === '미진단'
+          ? '등록된 성향에 맞춰 추천 목록에는 예금만 담았어요.'
+          : estimated.horizon === 'SHORT' || estimated.horizon === 'UNKNOWN'
+            ? '사용 시점이 가깝거나 정해지지 않아 투자 상품은 추천에서 제외했어요.'
+            : '계열사 상품의 실제 가입·매매는 해당 금융회사의 절차로 진행해요. 아래 과정은 데모예요.'}</p>
       {answers.purpose === 'HOUSING' ? (
         <div className="mt-3 space-y-3">
           {HOUSING_INFO.map((info) => (

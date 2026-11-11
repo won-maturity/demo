@@ -120,6 +120,10 @@
 .won-bank-lookup dt small { display: block; font-size: 10px; }
 .won-bank-lookup dd { font-weight: 730; text-align: right; }
 .won-bank-lookup-source { margin-top: 12px; border-top: 1px solid theme('colors.line'); padding-top: 8px; color: theme('colors.textWeak'); font-size: 11px; }
+.won-portfolio-summary { margin-top: 12px; padding-top: 10px; border-top: 1px solid theme('colors.line'); }
+.won-portfolio-summary h3 { font-size: 13px; font-weight: 740; }
+.won-portfolio-summary p { margin-top: 9px; font-size: 12px; line-height: 1.5; color: theme('colors.textBody'); }
+.won-portfolio-summary > small { display: block; margin-top: 6px; color: theme('colors.textWeak'); font-size: 10px; }
 .won-bank-lookup-error { display: grid; gap: 10px; padding-top: 13px; }
 .won-bank-lookup-error p { display: flex; align-items: start; gap: 6px; color: theme('colors.dangerText'); font-size: 13px; }
 .won-bank-lookup-error svg { flex-shrink: 0; margin-top: 2px; }

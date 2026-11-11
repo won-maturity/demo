@@ -6,8 +6,8 @@ export function BankLookupCard({ type, onRetry }: { type: 'maturity' | 'investme
   const maturity = useDemoStore((state) => state.maturityLookup);
   const investment = useDemoStore((state) => state.investmentLookup);
   const lookup = type === 'maturity' ? maturity : investment;
-  const title = type === 'maturity' ? '은행 조회 정보' : '투자성향 조회 정보';
-  const label = type === 'maturity' ? '만기 상품 정보를 확인하고 있어요' : '등록된 투자성향을 확인하고 있어요';
+  const title = type === 'maturity' ? '은행 조회 정보' : '성향·포트폴리오 조회';
+  const label = type === 'maturity' ? '만기 상품 정보를 확인하고 있어요' : '기존 진단과 분석 결과를 가져오고 있어요';
   return (
     <section className="won-bank-lookup" aria-label={title}>
       <header><Landmark size={17} aria-hidden /><h2>{title}</h2><small>시연 데이터</small></header>
@@ -39,7 +39,15 @@ export function BankLookupCard({ type, onRetry }: { type: 'maturity' | 'investme
             <div><dt>등록된 투자성향</dt><dd>{investment.data.riskProfile}</dd></div>
             <div><dt>진단일</dt><dd>{investment.data.diagnosedAt ? formatDotDate(investment.data.diagnosedAt) : '미진단'}</dd></div>
             <div><dt>진단 상태</dt><dd>{investment.data.diagnosis.label}</dd></div>
+            <div><dt>등록된 투자 의사</dt><dd>{investment.data.investmentPreference === 'declines' ? '투자를 원하지 않음' : '투자 비교 가능'}</dd></div>
           </dl>
+          <div className="won-portfolio-summary">
+            <h3>가져온 포트폴리오 분석</h3>
+            <dl>{investment.data.portfolio.allocations.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.percent}%</dd></div>)}</dl>
+            <p>{investment.data.portfolio.summary}</p>
+            <small>{investment.data.portfolio.source} · {formatDotDate(investment.data.portfolio.analyzedAt)}</small>
+          </div>
+          <p className="won-bank-lookup-source">기존 고객 진단 기록 · 조회 결과이며 이 채팅에서 새로 진단하지 않았어요.</p>
           {investment.data.diagnosis.state !== 'valid' && <p className="won-bank-lookup-source">투자 상품을 진행하기 전에 재진단이 필요해요.</p>}
         </>
       )}

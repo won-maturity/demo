@@ -4,6 +4,8 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation, useNavigat
 import { DemoBadge } from '../components/ui/DemoBadge';
 import { Toast } from '../components/ui/Toast';
 import { EnginePanel } from '../features/engine-panel/EnginePanel';
+import { AffiliateProductsPage } from '../features/banking/AffiliateProductsPage';
+import { AiGalleryPage, GalleryInvestmentPage, GalleryLoanCalculatorPage } from '../features/banking/AiGalleryPage';
 import { CatalogInfoPage, CurrentMenuPage } from '../features/banking/CurrentMenuPage';
 import { CurrentAssetsPage } from '../features/banking/CurrentAssetsPage';
 import { ProductMallPage } from '../features/banking/ProductMallPage';
@@ -100,6 +102,7 @@ export function App() {
               <Route path="/savings" element={<SavingsPage />} />
               <Route path="/spending" element={<SpendingPage />} />
               <Route path="/banking" element={<ProductMallPage />} />
+              <Route path="/banking/affiliates" element={<AffiliateProductsPage />} />
               <Route path="/banking/universal" element={<UniversalBankingPage />} />
               <Route path="/banking/category/:item" element={<CatalogInfoPage kind="product" />} />
               <Route path="/stocks" element={<StocksPage />} />
@@ -113,11 +116,14 @@ export function App() {
             <Route path="/maturity" element={<MaturityEntry />} />
             <Route path="/maturity/chat" element={<MaturityEntry chat />} />
             <Route path="/demo" element={<LauncherPage />} />
+            <Route path="/ai-gallery" element={<AiGalleryPage />} />
+            <Route path="/ai-gallery/loan-calculator" element={<GalleryLoanCalculatorPage />} />
             <Route path="/demo/phone" element={<PhoneHomeDemoPage />} />
             <Route path="/simulator" element={<SimulatorPage />} />
             <Route path="/navi/no-response" element={<NoResponsePage />} />
             <Route element={<RequirePersona />}>
               <Route path="/navi/summary" element={<SummaryPage />} />
+              <Route path="/ai-gallery/investment" element={<GalleryInvestmentPage />} />
               <Route path="/navi/chat" element={<ChatPage />} />
               <Route path="/navi/options" element={<OptionsPage />} />
               <Route path="/navi/confirm-deposit" element={<ConfirmDepositPage />} />

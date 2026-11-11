@@ -1,7 +1,7 @@
 import type { PurposeId, TimingId } from '../mock/chatScripts';
 import { PURPOSE_LABEL, TIMING_LABEL } from '../mock/chatScripts';
 import { DEMO_TODAY, type Persona } from '../mock/personas';
-import { INVEST_ID, PRODUCTS, REDEPOSIT_ID, getProduct, type CatalogProduct } from '../mock/products';
+import { ETF_PORTFOLIO_ID, INVEST_ID, PRODUCTS, REDEPOSIT_ID, getProduct, type CatalogProduct } from '../mock/products';
 import { formatKoreanDate } from '../lib/format';
 
 export type Horizon = 'SHORT' | 'MID' | 'LONG' | 'UNKNOWN';
@@ -14,7 +14,8 @@ export type RuleId =
   | 'RULE_QUIZ_FAIL_HANDOFF'
   | 'RULE_COOLING_OFF'
   | 'RULE_SPLIT_BY_PURPOSE'
-  | 'RULE_HIGH_BALANCE_PB';
+  | 'RULE_HIGH_BALANCE_PB'
+  | 'RULE_NO_INVESTMENT_PREFERENCE';
 
 export const ELDERLY_AGE = 65;
 export const QUIZ_FAIL_LIMIT = 2;
@@ -22,6 +23,7 @@ export const DIAGNOSIS_VALID_DAYS = 365;
 export const HIGH_BALANCE_THRESHOLD = 100_000_000;
 
 export const RULE_COPY: Record<RuleId, string> = {
+  RULE_NO_INVESTMENT_PREFERENCE: '투자를 원하지 않는 등록 의사를 우선해 투자 상품을 제외했어요.',
   RULE_DEFAULT_REDEPOSIT: '재예치는 항상 첫 번째 선택지이자 기본 선택이에요.',
   RULE_SHORT_TERM_NO_INVEST: '1년 안에 쓸 돈이라 투자 상품은 제외했어요.',
   RULE_SUITABILITY_ONLY: '투자성향이 맞지 않거나 진단이 없으면 투자 상품은 보여 드리지 않아요.',
@@ -68,16 +70,18 @@ export type Answers = {
 export type Option = {
   productId: string;
   name: string;
+  provider?: string;
   summary: string;
   rateText: string;
   annualRate: number | null;
-  isExample: true;
+  isExample: boolean;
+  officialUrl?: string;
+  officialCheckedAt?: string;
+  ticker?: string;
   principalGuaranteed: boolean;
   riskLabel: string;
   riskTone: 'safe' | 'caution' | 'danger';
   kind: CatalogProduct['kind'];
-  worstLossRate?: number;
-  feeRate?: number;
   reasons: string[];
   procedure: string;
   guide: string;
@@ -90,7 +94,8 @@ export type ExcludedProduct = {
   reason: string;
 };
 
-const INVEST_SUITABLE: Persona['riskProfile'][] = ['안정추구형'];
+const INVEST_SUITABLE: Persona['riskProfile'][] = ['안정추구형', '적극투자형'];
+type InvestorContext = Pick<Persona, 'riskProfile'> & Partial<Pick<Persona, 'investmentPreference'>>;
 
 export function estimateHorizon(answers: Answers): { horizon: Horizon; useDate?: string } {
   const useDate = answers.useDate && answers.useDate !== 'unknown' ? answers.useDate : undefined;
@@ -101,8 +106,8 @@ export function estimateHorizon(answers: Answers): { horizon: Horizon; useDate?:
   return { horizon: 'UNKNOWN' };
 }
 
-export function isInvestSuitable(persona: Pick<Persona, 'riskProfile'>): boolean {
-  return INVEST_SUITABLE.includes(persona.riskProfile);
+export function isInvestSuitable(persona: InvestorContext): boolean {
+  return persona.investmentPreference !== 'declines' && INVEST_SUITABLE.includes(persona.riskProfile);
 }
 
 function horizonLabel(horizon: Horizon, useDate?: string): string {
@@ -120,16 +125,18 @@ function toOption(product: CatalogProduct, reasons: string[], procedure: string,
   return {
     productId: product.id,
     name: product.name,
+    provider: product.provider,
     summary: summary ?? product.summary,
     rateText: product.rateText,
     annualRate: product.annualRate,
-    isExample: true,
+    isExample: product.isExample,
+    officialUrl: product.officialUrl,
+    officialCheckedAt: product.officialCheckedAt,
+    ticker: product.ticker,
     principalGuaranteed: product.principalGuaranteed,
     riskLabel: product.riskLabel,
     riskTone: product.riskTone,
     kind: product.kind,
-    worstLossRate: product.worstLossRate,
-    feeRate: product.feeRate,
     reasons,
     procedure,
     guide: '',
@@ -179,14 +186,14 @@ function situationLine(name: string, horizon: Horizon, useDate?: string, purpose
 }
 
 function decisionLine(
-  persona: Pick<Persona, 'riskProfile'>,
+  persona: InvestorContext,
   horizon: Horizon,
   hasInvest: boolean,
 ): string {
   if (hasInvest) {
-    return '오래 두셔도 되는 돈이고 투자성향이 맞아서, 재예치와 예금 옆에 투자 상품을 비교용으로만 넣었어요. 투자 상품은 오늘 가입이 끝나지 않고, 설명을 들은 뒤 하루를 더 두고 정해요. 아직 마음이 없으면 재예치를 그대로 진행하셔도 돼요.';
+    return '등록된 투자성향과 사용 시점에 맞춰 재예치와 계열사 상품을 함께 비교해요. 우리투자증권 RP형 CMA는 대기자금 운용 대안이에요. 적극투자형이면 우리자산운용 WON 미국S&P500도 주식 투자 대안으로 살펴볼 수 있어요. 투자 상품은 오늘 가입이 끝나지 않고, 설명을 들은 뒤 하루를 더 두고 정해요. 아직 마음이 없으면 재예치를 그대로 진행하셔도 돼요.';
   }
-  const depositOnly = persona.riskProfile === '안정형' || persona.riskProfile === '미진단';
+  const depositOnly = !isInvestSuitable(persona);
   if (horizon === 'SHORT' && depositOnly) {
     return '곧 쓸 돈이라 예금만 골랐어요. 기본으로 잡혀 있는 재예치는 지금 금리와 조건을 그대로 이어 가는 선택이에요. 돈을 쓰시는 날에 만기를 맞추고 싶으면, 그 아래 예금을 고르시면 돼요.';
   }
@@ -204,7 +211,7 @@ function decisionLine(
 
 function narrateOption(
   option: Option,
-  persona: Pick<Persona, 'riskProfile'>,
+  persona: InvestorContext,
   useDate: string | undefined,
   purpose?: PurposeId,
 ): { guide: string; proceedLabel: string } {
@@ -243,8 +250,14 @@ function narrateOption(
       proceedLabel: '이 예금으로 이어갈게요',
     };
   }
+  if (option.productId === INVEST_ID) {
+    return {
+      guide: '우리투자증권의 RP형 CMA예요. 장기 수익을 위한 주식 투자와 달리, 대기자금을 RP로 운용하며 수시입출금할 수 있어요. 약정수익률은 회사 고시에 따라 바뀌고 원금 손실 가능성이 있어요. 예금자보호 대상은 아니에요. 공식 설명서를 확인한 뒤 시연 절차를 이어가요.',
+      proceedLabel: 'RP형 CMA 설명 보기',
+    };
+  }
   return {
-    guide: `여유자금으로 오래 두신다고 하시고 투자성향이 ${persona.riskProfile}이라, 예금 옆에 ${option.name}도 비교용으로 넣었어요. 이 상품은 가격이 내리면 넣은 돈보다 적어질 수 있고, 예금자보호도 되지 않아요. 그래서 오늘은 설명과 이해도 확인까지만 하고, 내일 다시 보고 최종으로 정해요. 답이 없거나 마음이 바뀌면 재예치로 돌아가요.`,
+    guide: `여유자금으로 두실 수 있고 등록된 투자성향이 ${persona.riskProfile}이라, 예금 옆에 ${option.provider ? `${option.provider}의 ` : ''}${option.name}도 비교용으로 넣었어요. 이 상품은 가격이 내리면 넣은 돈보다 적어질 수 있고, 예금자보호도 되지 않아요. 그래서 오늘은 설명과 이해도 확인까지만 하고, 내일 다시 보고 최종으로 정해요. 답이 없거나 마음이 바뀌면 재예치로 돌아가요.`,
     proceedLabel: '설명부터 듣고 결정할게요',
   };
 }
@@ -258,7 +271,7 @@ function investProcedure(): string {
 }
 
 export function getEligibleOptions(
-  persona: Pick<Persona, 'riskProfile' | 'name'> & { principal?: number },
+  persona: Pick<Persona, 'riskProfile' | 'name'> & Partial<Pick<Persona, 'principal' | 'investmentPreference'>>,
   horizon: Horizon,
   useDate?: string,
   context: ChoiceContext = {},
@@ -267,7 +280,9 @@ export function getEligibleOptions(
   if ((persona.principal ?? 0) >= HIGH_BALANCE_THRESHOLD) appliedRules.push('RULE_HIGH_BALANCE_PB');
   if (context.split) appliedRules.push('RULE_SPLIT_BY_PURPOSE');
   const excluded: ExcludedProduct[] = [];
-  const profileLine = `투자성향은 ${persona.riskProfile}이에요.`;
+  const profileLine = persona.investmentPreference === 'declines'
+    ? '투자를 원하지 않는 것으로 등록되어 있어요.'
+    : `등록된 투자성향은 ${persona.riskProfile}이에요.`;
   const timeLine = horizonLabel(horizon, useDate);
 
   const redeposit = getProduct(REDEPOSIT_ID);
@@ -285,13 +300,17 @@ export function getEligibleOptions(
   };
 
   const investBlocked: string[] = [];
+  if (persona.investmentPreference === 'declines') {
+    appliedRules.push('RULE_NO_INVESTMENT_PREFERENCE');
+    investBlocked.push(RULE_COPY.RULE_NO_INVESTMENT_PREFERENCE);
+  }
   if (horizon === 'SHORT') {
     appliedRules.push('RULE_SHORT_TERM_NO_INVEST');
     investBlocked.push(RULE_COPY.RULE_SHORT_TERM_NO_INVEST);
   } else if (horizon === 'UNKNOWN') {
     investBlocked.push('자금 기간을 아직 몰라 투자 상품은 제외했어요.');
   }
-  if (!isInvestSuitable(persona)) {
+  if (!INVEST_SUITABLE.includes(persona.riskProfile)) {
     appliedRules.push('RULE_SUITABILITY_ONLY');
     investBlocked.push(
       persona.riskProfile === '미진단'
@@ -302,12 +321,14 @@ export function getEligibleOptions(
 
   if (investBlocked.length > 0) {
     pushExcluded(INVEST_ID, investBlocked.join(' '));
+    pushExcluded(ETF_PORTFOLIO_ID, investBlocked.join(' '));
   }
 
   const superProduct = getProduct('super-deposit');
   const wonPlus = getProduct('won-plus');
   const duru = getProduct('duruduru');
-  const fund = getProduct(INVEST_ID);
+  const fund = getProduct(persona.riskProfile === '적극투자형' ? ETF_PORTFOLIO_ID : INVEST_ID);
+  const showBothAffiliates = investBlocked.length === 0 && persona.riskProfile === '적극투자형';
 
   if (horizon === 'SHORT') {
     const dateLine = useDate ? `${formatKoreanDate(useDate)}에 만기를 맞출 수 있어요.` : superProduct.summary;
@@ -322,13 +343,17 @@ export function getEligibleOptions(
     pushExcluded('won-plus', '만기일을 사용 예정일에 맞추기 어려운 상품이에요.');
     pushExcluded('duruduru', '회전 주기가 짧은 사용 일정과 맞지 않아요.');
   } else if (horizon === 'MID') {
-    options.push(toOption(wonPlus, [timeLine, profileLine, '1~3년에는 시장금리를 반영하는 예금을 같이 보여 드려요.'], depositProcedure()));
+    options.push(toOption(
+      showBothAffiliates ? getProduct(INVEST_ID) : wonPlus,
+      [timeLine, profileLine, showBothAffiliates ? 'RP형 CMA는 투자 전 대기자금 운용 대안으로 비교해요.' : '1~3년에는 시장금리를 반영하는 예금을 같이 보여 드려요.'],
+      showBothAffiliates ? investProcedure() : depositProcedure(),
+    ));
     if (investBlocked.length === 0) {
       appliedRules.push('RULE_COOLING_OFF');
       options.push(
         toOption(fund, [timeLine, profileLine, '성향이 맞아 투자 상품을 비교 선택지에 넣었어요.', RULE_COPY.RULE_COOLING_OFF], investProcedure()),
       );
-      pushExcluded('super-deposit', '1~3년 구간에서는 금리 반영 예금과 투자 상품을 우선했어요.');
+      pushExcluded('super-deposit', '1~3년 구간에서는 재예치와 성향에 맞는 비교 상품을 우선했어요.');
       pushExcluded('duruduru', '회전복리 예금은 3년 이상일 때 우선해요.');
     } else {
       options.push(toOption(superProduct, [timeLine, profileLine, '만기일을 고를 수 있는 예금도 함께 보여 드려요.'], depositProcedure()));
@@ -336,7 +361,11 @@ export function getEligibleOptions(
     }
   } else if (horizon === 'LONG') {
     options.push(
-      toOption(duru, [timeLine, profileLine, '오래 두는 돈이라 회전복리 예금을 같이 보여 드려요.'], depositProcedure()),
+      toOption(
+        showBothAffiliates ? getProduct(INVEST_ID) : duru,
+        [timeLine, profileLine, showBothAffiliates ? '장기 투자 전 대기자금 운용 대안으로 RP형 CMA를 비교해요.' : '오래 두는 돈이라 회전복리 예금을 같이 보여 드려요.'],
+        showBothAffiliates ? investProcedure() : depositProcedure(),
+      ),
     );
     if (investBlocked.length === 0) {
       appliedRules.push('RULE_COOLING_OFF');
@@ -348,10 +377,10 @@ export function getEligibleOptions(
         ),
       );
       pushExcluded('super-deposit', '만기 맞춤 예금보다 장기 상품을 우선했어요.');
-      pushExcluded('won-plus', '장기 보유에는 회전복리 예금을 우선했어요.');
+      pushExcluded('won-plus', '장기 구간에서는 재예치와 성향에 맞는 비교 상품을 우선했어요.');
     } else {
       options.push(toOption(superProduct, [timeLine, profileLine, '만기를 직접 고르는 예금도 후보예요.'], depositProcedure()));
-      pushExcluded('won-plus', '장기 보유에는 회전복리 예금을 우선했어요.');
+      pushExcluded('won-plus', '장기 구간에서는 재예치와 성향에 맞는 비교 상품을 우선했어요.');
     }
   } else {
     options.push(
@@ -379,7 +408,9 @@ export function getEligibleOptions(
     ...narrateOption(option, persona, useDate, context.purpose),
   }));
   const heard = situationLine(persona.name, horizon, useDate, context.purpose);
-  const decision = decisionLine(
+  const decision = persona.investmentPreference === 'declines'
+    ? '투자를 원하지 않으시는 등록 의사에 따라 예금만 비교해요. 자금이 필요한 시점에 맞춰 재예치와 다른 예금의 조건을 확인해 보세요.'
+    : decisionLine(
     persona,
     horizon,
     narrated.some((option) => option.kind === 'invest'),
@@ -455,7 +486,7 @@ export function getFitScores(
     if (productId === 'super-deposit' && horizon === 'SHORT' && useDate) return 96;
     if (productId === 'duruduru' && horizon === 'LONG') return 90;
     if (productId === 'won-plus' && horizon === 'MID') return 88;
-    if (productId === INVEST_ID && (horizon === 'LONG' || horizon === 'MID') && isInvestSuitable(persona)) return 84;
+    if ((productId === INVEST_ID || productId === ETF_PORTFOLIO_ID) && (horizon === 'LONG' || horizon === 'MID') && isInvestSuitable(persona)) return 84;
     if (productId === REDEPOSIT_ID) return 78;
     if (productId === 'super-deposit') return 74;
     return 60;

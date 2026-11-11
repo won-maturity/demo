@@ -40,10 +40,10 @@ export function ProductMallPage() {
             <strong>{label}</strong>
           </Link>)}
         </nav>
-        <Link className="won-mall-group" to="/banking/universal">
-          <span className="won-group-tip">보험 상품이 추가됐어요 ✨</span>
+        <Link className="won-mall-group" to="/banking/affiliates">
+          <span className="won-group-tip">계열사 상품도 살펴보세요</span>
           <CarFront size={30} aria-hidden />
-          <span><strong>우리금융그룹 상품</strong><small>보험 · 증권 · 캐피탈 · 저축은행</small></span><ChevronRight size={20} aria-hidden />
+          <span><strong>우리금융그룹 상품</strong><small>우리투자증권 · 우리자산운용</small></span><ChevronRight size={20} aria-hidden />
         </Link>
         <section className="won-mall-consult">
           <h2>전문 <em>AI상담원</em>에게 물어보세요</h2>

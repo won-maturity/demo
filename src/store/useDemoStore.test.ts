@@ -29,7 +29,7 @@ describe('bank lookup conversation', () => {
         maturityDate: '2026-11-21', daysToMaturity: 30, autoRedeposit: true, source: 'demo-bank-service' },
     });
     expect(state.messages.at(-1)?.text).toContain('이 돈은 언제 쓰실 예정이세요?');
-    expect(state.messages.at(-1)?.text).toContain('자동 재예치는 켜져 있어요');
+    expect(state.messages.some((message) => message.text.includes('자동 재예치는 켜져 있어요'))).toBe(true);
   });
 
   it('keeps existing answers and avoids querying or introducing itself twice on reentry', async () => {
@@ -73,7 +73,7 @@ describe('bank lookup conversation', () => {
     const newRequest = store.startMaturityChat();
     await vi.runAllTimersAsync();
     await Promise.all([oldRequest, newRequest]);
-    expect(useDemoStore.getState().maturityLookup).toMatchObject({ status: 'success', data: { customerName: '이서연', principal: 50_000_000 } });
+    expect(useDemoStore.getState().maturityLookup).toMatchObject({ status: 'success', data: { customerName: '소원', principal: 50_000_000 } });
     expect(useDemoStore.getState().messages.some((message) => message.text.includes('양대건'))).toBe(false);
   });
 
@@ -84,18 +84,23 @@ describe('bank lookup conversation', () => {
     await vi.runAllTimersAsync();
     await request;
     expect(useDemoStore.getState().maturityLookup).toMatchObject({ status: 'success', data: { autoRedeposit: false } });
-    expect(useDemoStore.getState().messages.at(-1)?.text).toContain('자동 재예치는 꺼져 있어요');
+    expect(useDemoStore.getState().messages.some((message) => message.text.includes('자동 재예치는 꺼져 있어요'))).toBe(true);
   });
 
-  it('does not query investment information for a deposit-only comparison', async () => {
+  it('retrieves existing analysis for a customer who declines investment and keeps deposit-only choices', async () => {
     const store = useDemoStore.getState();
     store.setAnswers({ timing: 'OVER_3Y', purpose: 'SPARE' });
-    await store.prepareChatOptions();
-    expect(useDemoStore.getState().investmentLookup.status).toBe('idle');
+    const request = store.prepareChatOptions();
+    await vi.runAllTimersAsync();
+    await request;
+    expect(useDemoStore.getState().investmentLookup).toMatchObject({ status: 'success', data: {
+      investmentPreference: 'declines', portfolio: { allocations: [{ label: '예금·현금', percent: 100 }] },
+    } });
+    expect(useDemoStore.getState().messages.at(-1)?.text).toContain('예금만');
     expect(useDemoStore.getState().chatStep).toBe('closing');
   });
 
-  it('queries the registered investment profile when needed and reports an expired diagnosis', async () => {
+  it('retrieves the stored diagnosis without renewing an expired date', async () => {
     const store = useDemoStore.getState();
     store.selectPersona('B');
     store.setAnswers({ timing: 'OVER_3Y', purpose: 'SPARE' });
@@ -104,8 +109,8 @@ describe('bank lookup conversation', () => {
     expect(useDemoStore.getState().chatStep).not.toBe('closing');
     await vi.runAllTimersAsync();
     await request;
-    expect(useDemoStore.getState().investmentLookup).toMatchObject({ status: 'success', data: { riskProfile: '안정추구형', diagnosis: { state: 'expired' } } });
-    expect(useDemoStore.getState().messages.some((message) => message.text.includes('재진단이 필요해요'))).toBe(true);
+    expect(useDemoStore.getState().investmentLookup).toMatchObject({ status: 'success', data: { riskProfile: '안정형', diagnosis: { state: 'expired' } } });
+    expect(useDemoStore.getState().investmentLookup).toMatchObject({ status: 'success', data: { diagnosedAt: '2025-09-01' } });
     expect(useDemoStore.getState().invest.profile).toBe(false);
     expect(useDemoStore.getState().chatStep).toBe('closing');
   });
@@ -125,6 +130,37 @@ describe('bank lookup conversation', () => {
     await retry;
     expect(useDemoStore.getState().investmentLookup.status).toBe('success');
     expect(useDemoStore.getState().chatStep).toBe('closing');
+  });
+
+  it('retrieves Kim Jaewon’s existing aggressive diagnosis and external portfolio report', async () => {
+    const store = useDemoStore.getState();
+    store.selectPersona('A');
+    const request = store.startMaturityChat();
+    await vi.runAllTimersAsync();
+    await request;
+    const lookup = useDemoStore.getState().investmentLookup;
+    expect(lookup).toMatchObject({ status: 'success', data: {
+      riskProfile: '적극투자형', diagnosedAt: '2026-04-02', source: 'demo-profile-service',
+      portfolio: { analyzedAt: '2026-10-15', allocations: [
+        { label: '주식·ETF', percent: 65 }, { label: '채권', percent: 15 }, { label: '예금·현금', percent: 20 },
+      ] },
+    } });
+    await store.fetchInvestmentContext();
+    expect(useDemoStore.getState().investmentLookup).toBe(lookup);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('resets investment approvals when the product changes and records the selected securities product', () => {
+    const store = useDemoStore.getState();
+    store.selectPersona('A');
+    store.selectProduct('woori-securities-rp-cma');
+    store.markInvest('profile');
+    store.markInvest('explain');
+    store.selectProduct('won-sp500-etf');
+    expect(useDemoStore.getState().invest.profile).toBe(false);
+    expect(useDemoStore.getState().invest.explain).toBe(false);
+    store.complete('invest');
+    expect(useDemoStore.getState().completion?.productId).toBe('won-sp500-etf');
   });
 
   it('ignores an investment lookup that finishes after a customer reset', async () => {

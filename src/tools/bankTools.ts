@@ -1,3 +1,4 @@
+import { PORTFOLIO_REPORTS, type PortfolioReport } from '../mock/portfolioReports';
 import { diagnosisStatus } from '../engine/rules';
 import { daysUntil, DEMO_TODAY, exampleInterest, getPersona, type PersonaId } from '../mock/personas';
 
@@ -24,9 +25,10 @@ export type InvestmentProfile = {
   riskProfile: ReturnType<typeof getPersona>['riskProfile'];
   diagnosedAt?: string;
   diagnosis: ReturnType<typeof diagnosisStatus>;
-  renewed: boolean;
+  investmentPreference: 'open' | 'declines';
+  portfolio: PortfolioReport;
   checkedAt: string;
-  source: 'demo-bank-service';
+  source: 'demo-profile-service';
 };
 
 async function simulateBankQuery(fail: boolean) {
@@ -58,18 +60,18 @@ export async function lookupMaturityAccount(input: {
 
 export async function lookupInvestmentProfile(input: {
   personaId: PersonaId;
-  renewed: boolean;
   fail?: boolean;
 }): Promise<InvestmentProfile> {
   await simulateBankQuery(input.fail ?? false);
   const persona = getPersona(input.personaId);
-  const diagnosedAt = input.renewed ? DEMO_TODAY : persona.diagnosedAt;
+  const diagnosedAt = persona.diagnosedAt;
   return {
     riskProfile: persona.riskProfile,
     diagnosedAt,
     diagnosis: diagnosisStatus(diagnosedAt, DEMO_TODAY),
-    renewed: input.renewed,
+    investmentPreference: persona.investmentPreference,
+    portfolio: PORTFOLIO_REPORTS[input.personaId],
     checkedAt: DEMO_TODAY,
-    source: 'demo-bank-service',
+    source: 'demo-profile-service',
   };
 }

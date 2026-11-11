@@ -55,7 +55,7 @@ export function LauncherPage() {
                   {persona.name} · {persona.age}세
                 </span>
               </div>
-              <p className="mt-1 text-[13px] text-textBody">{persona.riskProfile} · 정기예금</p>
+              <p className="mt-1 text-[13px] text-textBody">{persona.riskProfile}{persona.investmentPreference === 'declines' ? ' · 투자 의사 없음' : ''} · 정기예금</p>
               <p className="mt-2 text-sm leading-6 text-textStrong">{persona.outcome}</p>
               <span className="mt-3 inline-flex min-h-tap items-center text-sm font-bold text-primary">이 고객으로 시작</span>
             </button>
