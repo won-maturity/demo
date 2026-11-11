@@ -1,89 +1,47 @@
-import { Bell, Landmark, PiggyBank, TicketPercent, Wallet } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { AmountText } from '../../components/ui/AmountText';
-import { Badge } from '../../components/ui/Badge';
-import { BottomTabBar, type TabId } from '../../components/ui/BottomTabBar';
-import { Card } from '../../components/ui/Card';
-import { PrimaryButton } from '../../components/ui/Buttons';
-import { ProgressSteps } from '../../components/ui/ProgressSteps';
-import { formatManWon } from '../../lib/format';
-import { daysUntil, getPersona } from '../../mock/personas';
-import { useDemoStore } from '../../store/useDemoStore';
-
-const quick = [
-  { label: '이체', icon: Wallet },
-  { label: '상품', icon: Landmark },
-  { label: '혜택', icon: TicketPercent },
-  { label: '자산', icon: PiggyBank },
-];
+import { ArrowRight, Bell, ChevronRight, Menu, MessageCircleMore } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { daysUntil } from '../../mock/personas';
+import { AccountCard } from '../banking/AccountCards';
+import { useBankingCustomer, useOpenMaturity } from '../banking/BankingShell';
+import { getAccounts } from '../banking/data';
 
 export function HomePage() {
-  const navigate = useNavigate();
-  const personaId = useDemoStore((state) => state.personaId);
-  const showToast = useDemoStore((state) => state.showToast);
-  if (!personaId) return null;
-  const persona = getPersona(personaId);
-  const dday = daysUntil(persona.maturityDate);
-
-  const onTab = (id: TabId) => {
-    if (id === 'home') return;
-    showToast('데모에서는 WON하는 만기만 이동할 수 있어요.');
-  };
+  const { name, persona } = useBankingCustomer();
+  const openMaturity = useOpenMaturity();
+  const days = daysUntil(persona.maturityDate);
 
   return (
-    <div className="flex h-full flex-col bg-bg">
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-3">
-        <p className="text-[13px] font-bold text-primary">우리WON뱅킹</p>
-        <div className="flex items-end justify-between gap-3">
-          <h1 className="text-[22px] font-bold text-textStrong">{persona.name}님</h1>
-          <button type="button" className="min-h-tap text-sm font-semibold text-textBody" onClick={() => navigate('/')}>
-            시연 처음
+    <>
+      <header className="won-header won-home-header">
+        <h1><Link to="/demo" aria-label={`${name}님, 시연 고객 변경`}>{name}님</Link></h1>
+        <div className="won-header-actions">
+          <button type="button" onClick={openMaturity} className="won-icon-button" aria-label="WON하는 만기 상담"><MessageCircleMore size={23} aria-hidden /></button>
+          <Link to="/notifications" className="won-icon-button won-notification-icon" aria-label="새 알림"><Bell size={23} aria-hidden /></Link>
+          <Link to="/menu" className="won-icon-button" aria-label="전체 메뉴"><Menu size={23} aria-hidden /></Link>
+        </div>
+      </header>
+      <main className="won-scroll won-home">
+        <section className="won-home-feature" aria-label="만기 알림">
+          <button type="button" className="won-hero-link" onClick={openMaturity} aria-label="WON하는 만기 시작">
+            <span className="won-hero-copy">
+              <strong className="won-hero-accent">{persona.productName} 만기</strong>가<br />
+              {days}일 남았어요.<br />
+              <strong className="won-hero-accent">만기 자금</strong>을 확인해보세요 <ArrowRight size={24} aria-hidden />
+            </span>
+            <span className="won-alert-art" aria-hidden>!</span>
           </button>
-        </div>
-        <Card className="mt-3">
-          <p className="text-[13px] text-textBody">만기 예정 {persona.productName}</p>
-          <div className="mt-1">
-            <AmountText value={persona.principal} />
+          <div className="won-hero-actions">
+            <button className="won-pill won-pill-primary" type="button" onClick={openMaturity}>WON하는 만기</button>
+            <Link to="/notifications" className="won-pill">더보기</Link>
           </div>
-          <p className="mt-1 text-sm text-textBody">만기일 {persona.maturityDate.replaceAll('-', '.')} · D-{dday}</p>
-        </Card>
-        <div className="mt-3 grid grid-cols-4 gap-2">
-          {quick.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => showToast('데모에서는 WON하는 만기만 이동할 수 있어요.')}
-                className="flex min-h-tap flex-col items-center justify-center gap-1 rounded-card bg-surface py-2 text-xs font-semibold text-textStrong shadow-card"
-              >
-                <Icon size={18} className="text-primary" aria-hidden />
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-        <div className="mt-3 flex items-center gap-1 text-sm font-bold text-textStrong">
-          <Bell size={16} aria-hidden /> 알림
-        </div>
-        <Card className="mt-2 border border-primary/20">
-          <div className="flex items-center gap-2">
-            <Badge tone="ai">WON하는 만기</Badge>
-            <Badge tone="neutral">D-{dday}</Badge>
-          </div>
-          <p className="mt-2 text-[16px] font-bold leading-6 text-textStrong">
-            {persona.productName} 만기가 {dday}일 남았어요
-          </p>
-          <p className="mt-1 text-sm text-textBody">{formatManWon(persona.principal)}</p>
-          <div className="mt-3">
-            <PrimaryButton onClick={() => navigate('/navi/summary')}>어떻게 할지 같이 정해요</PrimaryButton>
-          </div>
-          <div className="mt-3">
-            <ProgressSteps current={1} />
-          </div>
-        </Card>
-      </div>
-      <BottomTabBar active="home" onChange={onTab} />
-    </div>
+        </section>
+        <section className="won-account-list" aria-label="내 계좌">
+          {getAccounts(persona).slice(0, 4).map((account, index) => (
+            <AccountCard key={account.id} account={account} notice={index === 0 ? `${persona.productName} 만기가 ${days}일 남았어요` : undefined} />
+          ))}
+        </section>
+        <Link to="/assets" className="won-section-link">전체 계좌 보기 <ChevronRight size={18} aria-hidden /></Link>
+      </main>
+    </>
   );
 }

@@ -28,7 +28,7 @@ export function SummaryPage() {
       footer={
         <>
           <PrimaryButton onClick={() => navigate('/navi/chat')}>용도부터 이야기해요</PrimaryButton>
-          <SecondaryButton onClick={() => navigate('/navi/no-response')}>아무것도 안 하면?</SecondaryButton>
+          <SecondaryButton onClick={() => navigate('/navi/no-response', { state: { fromSummary: true } })}>아무것도 안 하면?</SecondaryButton>
         </>
       }
     >

@@ -17,11 +17,12 @@ export type Persona = {
 };
 
 export const DEMO_TODAY = '2026-10-22';
+export const DEFAULT_PERSONA_ID = 'D';
 
 export const PERSONAS: Persona[] = [
   {
-    id: 'D',
-    name: '정하늘',
+    id: DEFAULT_PERSONA_ID,
+    name: '양대건',
     age: 39,
     riskProfile: '안정형',
     diagnosedAt: '2026-08-01',

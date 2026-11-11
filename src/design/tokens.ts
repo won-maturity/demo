@@ -1,39 +1,38 @@
-/**
- * 디자인 토큰.
- * /reference 캡처가 없어 프롬프트의 기본값을 사용한다.
- * TODO: reference에서 확인
- */
+// Mobile demo tokens. See DESIGN.md for the source and role of each palette.
 export const colors = {
-  primary: '#0067AC',
-  primaryPressed: '#00508A',
-  bg: '#F4F6F9',
+  primary: '#0967CF',
+  primaryPressed: '#0754AC',
+  bg: '#EFF2F4',
+  appSky: '#E3F2FC',
   surface: '#FFFFFF',
-  textStrong: '#191F28',
-  textBody: '#4E5968',
-  // 기본 제안 #8B95A1 은 흰 배경 대비가 약 3:1이라 본문 보조색은 4.5:1 이상으로 조정
-  // TODO: reference에서 확인
-  textWeak: '#5C6770',
-  line: '#E5E8EB',
+  textStrong: '#303840',
+  textBody: '#505A64',
+  textWeak: '#63717E',
+  line: '#E2E7EC',
+  brandDeep: '#0067AC',
+  brandCyan: '#20C4F4',
+  brandBlue: '#0083CA',
+  visualBlue: '#268CF3',
   success: '#0E9F6E',
   successText: '#067647',
   caution: '#E8890C',
   cautionText: '#8A4B00',
   danger: '#E5484D',
-  dangerText: '#B42318',
-  stage: '#0B1220',
-  ai: '#0067AC',
+  dangerText: '#C8272D',
+  stage: '#DFECF3',
+  ai: '#0967CF',
 } as const;
 
 export const radius = {
-  card: 16,
+  card: 18,
   button: 12,
   chip: 999,
 } as const;
 
 export const layout = {
-  screenPadding: 20,
+  screenPadding: 16,
   grid: 4,
   buttonMinHeight: 44,
-  frameWidth: 390,
+  frameWidth: 400,
   frameHeight: 844,
 } as const;

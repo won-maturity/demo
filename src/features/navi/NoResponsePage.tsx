@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui/Card';
 import { PrimaryButton, SecondaryButton } from '../../components/ui/Buttons';
 import { Screen } from '../../components/ui/Screen';
@@ -17,6 +17,7 @@ const steps = [
 
 export function NoResponsePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const personaId = useDemoStore((state) => state.personaId);
   const autoRedeposit = useDemoStore((state) => state.autoRedeposit);
   const addConsent = useDemoStore((state) => state.addConsent);
@@ -45,7 +46,7 @@ export function NoResponsePage() {
     <Screen
       title="무응답 시뮬레이션"
       step={1}
-      onBack={() => navigate(persona ? '/navi/summary' : '/')}
+      onBack={() => navigate(location.state?.fromSummary && persona ? '/navi/summary' : location.state?.fromDemo ? '/demo' : '/menu')}
       footer={
         <>
           <SecondaryButton onClick={replay}>타임라인 다시 보기</SecondaryButton>

@@ -1,2 +1,16 @@
-# woori-won-ideathon
-woori won banking ideathon
+# WON하는 만기
+
+우리WON뱅킹 스타일의 아이디어 경진대회 데모입니다.
+
+```sh
+npm ci
+npm run dev
+```
+
+앱에서 **홈 → WON하는 만기**로 들어가세요. 처음 열면 추천 시연 고객으로 시작합니다. **전체 → 시연 고객 및 엔진 패널**에서 다른 고객과 엔진 표시를 선택할 수 있습니다.
+
+**홈 → 알림 → 바탕화면 알림 시연**에서 스마트폰 바탕화면을 열 수 있습니다. 잠시 뒤 나타나는 만기 알림을 누르면 WON하는 만기 요약이 열립니다. 이 장면은 브라우저 알림 권한 없이 재생됩니다.
+
+**홈 → 알림 → 시연 알림 보내기**를 누르고 브라우저 알림을 허용하세요. 기기 알림을 누르면 WON하는 만기가 열립니다. 로컬호스트 또는 HTTPS에서 동작하는 시연용 알림이며, 서버 예약 발송 없이 버튼으로 호출합니다. 브라우저가 기기 알림을 지원하지 않으면 앱 안의 만기 알림을 누르세요.
+
+화면 수정 시 [DESIGN.md](DESIGN.md)를 참조하세요. Oh My Design을 Codex에 다시 설치하려면 프로젝트 루트에서 `npx oh-my-design-cli@latest install-skills --agent codex --all`을 실행하세요. Claude Code는 프로젝트에 포함된 [WON뱅킹 디자인 스킬](.claude/skills/woori-won-design/SKILL.md)을 읽습니다.

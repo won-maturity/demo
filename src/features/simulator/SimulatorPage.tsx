@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ExampleValue } from '../../components/ui/AmountText';
 import { Card } from '../../components/ui/Card';
 import { Screen } from '../../components/ui/Screen';
@@ -8,6 +8,7 @@ import { formatEok } from '../../lib/format';
 
 export function SimulatorPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [volumeJo, setVolumeJo] = useState(EFFECT_DEFAULTS.maturityVolume / 1_000_000_000_000);
   const [retentionPp, setRetentionPp] = useState(EFFECT_DEFAULTS.retentionDelta * 100);
   const [fundingPp, setFundingPp] = useState(EFFECT_DEFAULTS.fundingGap * 100);
@@ -27,7 +28,7 @@ export function SimulatorPage() {
   );
 
   return (
-    <Screen title="수익성 시뮬레이터" onBack={() => navigate('/')}>
+    <Screen title="수익성 시뮬레이터" onBack={() => navigate(location.state?.fromDemo ? '/demo' : '/menu')}>
       <p className="text-sm leading-6 text-textBody">은행 관점에서, 만기 자금을 지키면 비용과 수수료가 어떻게 달라지는지 봐요.</p>
       <Card className="mt-3 space-y-4">
         <Slider label="연간 만기 도래액" value={volumeJo} min={10} max={200} step={10} suffix="조 원" onChange={setVolumeJo} />

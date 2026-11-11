@@ -10,9 +10,9 @@ body,
 
 body {
   margin: 0;
-  background: #0b1220;
-  color: #191f28;
-  font-family: Pretendard, system-ui, 'Apple SD Gothic Neo', sans-serif;
+  background: theme('colors.stage');
+  color: theme('colors.textStrong');
+  font-family: Pretendard, 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
