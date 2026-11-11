@@ -54,7 +54,6 @@ export function OptionsPage() {
   return (
     <Screen
       title="선택지 비교"
-      step={3}
       onBack={() => navigate('/navi/chat')}
       footer={
         <PrimaryButton onClick={proceed}>

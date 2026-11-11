@@ -53,7 +53,6 @@ export function QuizPage() {
   return (
     <Screen
       title={`이해도 확인 ${quizIndex + 1}/${QUIZ.length}`}
-      step={4}
       onBack={() => navigate('/navi/invest/explain')}
       footer={
         quizExplain ? (

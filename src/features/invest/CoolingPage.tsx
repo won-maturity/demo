@@ -14,7 +14,6 @@ export function CoolingPage() {
   return (
     <Screen
       title="숙려"
-      step={4}
       onBack={() => navigate('/navi/invest/quiz')}
       footer={
         <>

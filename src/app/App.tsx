@@ -4,9 +4,13 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation, useNavigat
 import { DemoBadge } from '../components/ui/DemoBadge';
 import { Toast } from '../components/ui/Toast';
 import { EnginePanel } from '../features/engine-panel/EnginePanel';
+import { CatalogInfoPage, CurrentMenuPage } from '../features/banking/CurrentMenuPage';
+import { CurrentAssetsPage } from '../features/banking/CurrentAssetsPage';
+import { ProductMallPage } from '../features/banking/ProductMallPage';
+import { StocksPage } from '../features/banking/StocksPage';
 import { AccountPage, AssetsPage, SavingsPage } from '../features/banking/AssetsPages';
 import { BankingShell } from '../features/banking/BankingShell';
-import { BenefitsPage, BenefitDetailsPage, MenuPage, NotificationsPage } from '../features/banking/ServicesPages';
+import { BenefitsPage, BenefitDetailsPage, NotificationsPage } from '../features/banking/ServicesPages';
 import { SpendingPage } from '../features/banking/SpendingPage';
 import { CardDetailsPage, UniversalBankingPage } from '../features/banking/UniversalBanking';
 import { HandoffPage } from '../features/handoff/HandoffPage';
@@ -36,7 +40,7 @@ function AnimatedOutlet() {
   return (
     <motion.div
       key={location.pathname}
-      className="h-full"
+      className="h-full min-w-0"
       initial={reduceMotion ? false : { opacity: 0, x: 8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: reduceMotion ? 0 : 0.16 }}
@@ -46,13 +50,14 @@ function AnimatedOutlet() {
   );
 }
 
-function MaturityEntry() {
+function MaturityEntry({ chat = false }: { chat?: boolean }) {
+  const { state } = useLocation();
   const personaId = useDemoStore((state) => state.personaId);
   const selectPersona = useDemoStore((state) => state.selectPersona);
   useEffect(() => {
     if (!useDemoStore.getState().personaId) selectPersona(DEFAULT_PERSONA_ID);
   }, [selectPersona]);
-  return personaId ? <Navigate to="/navi/summary" replace /> : null;
+  return personaId ? <Navigate to={chat ? "/navi/chat" : "/navi/summary"} state={chat ? state : undefined} replace /> : null;
 }
 
 function Shell() {
@@ -70,7 +75,7 @@ function Shell() {
   const toast = useDemoStore((state) => state.toast);
   return (
     <>
-      <div className="relative min-h-0 flex-1">
+      <div className="relative min-h-0 min-w-0 flex-1">
         <AnimatedOutlet />
       </div>
       <EnginePanel />
@@ -89,18 +94,24 @@ export function App() {
             <Route path="/" element={<Navigate to="/home" replace />} />
             <Route element={<BankingShell />}>
               <Route path="/home" element={<HomePage />} />
-              <Route path="/assets" element={<AssetsPage />} />
+              <Route path="/assets" element={<CurrentAssetsPage />} />
+              <Route path="/assets/accounts" element={<AssetsPage />} />
               <Route path="/assets/accounts/:accountId" element={<AccountPage />} />
               <Route path="/savings" element={<SavingsPage />} />
               <Route path="/spending" element={<SpendingPage />} />
-              <Route path="/banking" element={<UniversalBankingPage />} />
+              <Route path="/banking" element={<ProductMallPage />} />
+              <Route path="/banking/universal" element={<UniversalBankingPage />} />
+              <Route path="/banking/category/:item" element={<CatalogInfoPage kind="product" />} />
+              <Route path="/stocks" element={<StocksPage />} />
               <Route path="/banking/card/:view" element={<CardDetailsPage />} />
               <Route path="/benefits" element={<BenefitsPage />} />
               <Route path="/benefits/services/:serviceId" element={<BenefitDetailsPage />} />
-              <Route path="/menu" element={<MenuPage />} />
+              <Route path="/menu" element={<CurrentMenuPage />} />
+              <Route path="/menu/service/:item" element={<CatalogInfoPage kind="menu" />} />
               <Route path="/notifications" element={<NotificationsPage />} />
             </Route>
             <Route path="/maturity" element={<MaturityEntry />} />
+            <Route path="/maturity/chat" element={<MaturityEntry chat />} />
             <Route path="/demo" element={<LauncherPage />} />
             <Route path="/demo/phone" element={<PhoneHomeDemoPage />} />
             <Route path="/simulator" element={<SimulatorPage />} />

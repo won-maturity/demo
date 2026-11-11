@@ -6,17 +6,18 @@ export type Account = {
   name: string;
   amount: number;
   number: string;
-  brand: 'woori' | 'ibk' | 'kakao' | 'hana';
+  brand: 'woori' | 'ibk' | 'kakao' | 'hana' | 'kb';
   action: string;
   detail?: string;
 };
 
 export function getAccounts(persona: Persona): Account[] {
   return [
-    { id: 'won', name: '우리WON 통장', amount: 3_560_000, number: '1234-567-891011', brand: 'woori', action: '이체' },
+    { id: 'won', name: '우리 SUPER주거래 통장', amount: 0, number: '우리 1002-000-000224', brand: 'woori', action: '이체', detail: '거래중지' },
     { id: 'ibk', name: '기업 좋은 정기적금', amount: 1_700_000, number: '1234-567-891022', brand: 'ibk', action: '이체' },
     { id: 'kakao', name: '카카오뱅크 중금리 대출', amount: 57_000_000, number: '1234-567-891033', brand: 'kakao', action: '추가입금', detail: '금리 5.1%' },
     { id: 'hana', name: '하나 중고차 다이렉트', amount: 8_400_000, number: '1234-567-891044', brand: 'hana', action: '상세', detail: '금리 3.9%' },
+    { id: 'kb', name: '국민은행', amount: 3_560_000, number: '12345678901234', brand: 'kb', action: '이체' },
     { id: 'maturity', name: `우리은행 ${persona.productName}`, amount: persona.principal, number: '1234-567-891055', brand: 'woori', action: '만기 관리', detail: `만기일 ${formatDotDate(persona.maturityDate)}` },
   ];
 }

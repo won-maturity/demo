@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Bot, ChevronLeft, EyeOff, MessagesSquare, Plus, RotateCcw, Send } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChatBubble } from '../../components/ui/ChatBubble';
 import { Chip } from '../../components/ui/Chip';
 import { PrimaryButton, SecondaryButton } from '../../components/ui/Buttons';
-import { Screen } from '../../components/ui/Screen';
+import { WonArt } from '../banking/WonCurrentUI';
+import './won-chat.css';
 import { EXAMPLE_UTTERANCES } from '../../engine/interpret';
 import { estimateHorizon, getEligibleOptions, needsHandoff } from '../../engine/rules';
 import { InterpretCard } from './InterpretCard';
@@ -18,12 +19,16 @@ import {
   type PurposeId,
   type TimingId,
 } from '../../mock/chatScripts';
-import { getPersona } from '../../mock/personas';
+import { DEMO_TODAY, getPersona } from '../../mock/personas';
 import { useDemoStore } from '../../store/useDemoStore';
 
 export function ChatPage() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const backTo = ['/home', '/banking', '/menu'].includes(state?.fromBanking) ? state.fromBanking : '/navi/summary';
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [examples, setExamples] = useState(false);
   const personaId = useDemoStore((state) => state.personaId);
   const messages = useDemoStore((state) => state.messages);
   const chatStep = useDemoStore((state) => state.chatStep);
@@ -42,7 +47,7 @@ export function ChatPage() {
   const [pickingIndex, setPickingIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ block: 'end' });
+    if (messages.length > 2 || chatStep !== 'timing') bottomRef.current?.scrollIntoView({ block: 'end' });
   }, [messages, chatStep, interpret]);
 
   if (!personaId) return null;
@@ -119,103 +124,104 @@ export function ChatPage() {
   const showSpeech = chatStep === 'timing' || chatStep === 'purpose' || chatStep === 'date';
 
   return (
-    <Screen
-      title="자금 용도"
-      step={2}
-      onBack={() => navigate('/navi/summary')}
-      footer={
-        chatStep === 'closing' ? (
+    <div className="won-chat">
+      <header className="won-chat-header">
+        <button type="button" onClick={() => navigate(backTo)} aria-label="뒤로 가기"><ChevronLeft size={26} /></button>
+        <h1>AI챗봇과 대화중</h1>
+        <span className="won-chat-orb" aria-hidden />
+      </header>
+      <nav className="won-chat-tools" aria-label="상담 메뉴">
+        <button type="button" onClick={() => navigate('/navi/handoff')}><MessagesSquare size={17} aria-hidden />톡상담</button>
+        <button type="button" onClick={() => navigate('/home')}><EyeOff size={17} aria-hidden />상담숨기기</button>
+        <button type="button" onClick={() => {
+          useDemoStore.getState().selectPersona(personaId);
+          setPickingIndex(null);
+          setDraft('');
+          setExamples(false);
+          bottomRef.current?.closest('.won-chat-feed')?.scrollTo(0, 0);
+        }}><RotateCcw size={17} aria-hidden />처음으로</button>
+      </nav>
+      <main className="won-chat-feed">
+        <div className="won-chat-date"><time dateTime={DEMO_TODAY}>{DEMO_TODAY.replaceAll('-', '.')}</time></div>
+        <p className="won-chat-connected">AI챗봇과 연결하였습니다</p>
+        <section className="won-chat-greeting">
+          <span className="won-chat-bot"><Bot size={24} aria-hidden /></span>
+          <h2>{persona.name} 고객님, 안녕하세요.<br />우리은행 AI챗봇입니다.</h2>
+          <p>{messages[1]?.text ?? '만기 자금을 어떻게 쓰실 계획인가요?'}</p>
+        </section>
+        <div className="won-chat-messages" aria-live="polite">
+          {messages.slice(2).map((message) => <ChatBubble key={message.id} role={message.role}>{message.text}</ChatBubble>)}
+          {chatStep === 'interpret' && interpret && (
+            <InterpretCard
+              items={interpret.items}
+              notes={validationNotes}
+              pickingIndex={pickingIndex}
+              onPickDate={(index, date) => {
+                answerIntentDate(index, date);
+                setPickingIndex(null);
+              }}
+              onPickTiming={answerIntentTiming}
+              onAskCustomDate={setPickingIndex}
+            />
+          )}
+        </div>
+        {showSpeech && (
+          <div className="won-chat-chips">
+            {chatStep === 'timing' && TIMING_CHIPS.map((chip) => <Chip key={chip.id} label={chip.label} onClick={() => onTiming(chip.id as TimingId)} />)}
+            {chatStep === 'purpose' && PURPOSE_CHIPS.map((chip) => <Chip key={chip.id} label={chip.label} onClick={() => onPurpose(chip.id as PurposeId)} />)}
+            {chatStep === 'date' && DATE_CHIPS.map((chip) => <Chip key={chip.id} label={chip.label} onClick={() => onDate(chip.id)} />)}
+            {persona.id !== 'A' && persona.id !== 'D' && chatStep !== 'date' && <Chip label="투자 상품이 궁금해요" onClick={askInvest} />}
+          </div>
+        )}
+        {chatStep === 'timing' && messages.length <= 2 && (
+          <section className="won-chat-guide">
+            <h3><em>만기 자금</em>에 대해<br />궁금한 내용이 있으신가요?</h3>
+            <p>{messages[0]?.text ?? '쓰실 날짜와 용도를 이야기해 보세요!'}</p>
+            <WonArt kind="house" />
+            <PrimaryButton onClick={() => inputRef.current?.focus()}>AI챗봇과 만기 상담하기</PrimaryButton>
+          </section>
+        )}
+        <div ref={bottomRef} />
+      </main>
+      <footer className="won-chat-footer">
+        {chatStep === 'closing' ? (
           <PrimaryButton onClick={() => navigate('/navi/options')}>선택지 보기</PrimaryButton>
         ) : chatStep === 'handoff' ? (
           <PrimaryButton onClick={() => navigate('/navi/handoff')}>전문가에게 연결</PrimaryButton>
         ) : chatStep === 'interpret' ? (
           <div className="space-y-2">
-            <PrimaryButton disabled={needsConfirm} onClick={acceptIntent}>
-              이대로 맞아요
-            </PrimaryButton>
-            <SecondaryButton
-              onClick={() => {
-                reviseIntent();
-                setPickingIndex(null);
-                appendMessage('ai', '다시 말씀해 주시거나 아래에서 골라 주세요.');
-              }}
-            >
-              고칠게요
-            </SecondaryButton>
+            <PrimaryButton disabled={needsConfirm} onClick={acceptIntent}>이대로 맞아요</PrimaryButton>
+            <SecondaryButton onClick={() => {
+              reviseIntent();
+              setPickingIndex(null);
+              appendMessage('ai', '다시 말씀해 주시거나 아래에서 골라 주세요.');
+            }}>고칠게요</SecondaryButton>
           </div>
         ) : (
-          <div className="space-y-2">
-            <div className="flex flex-wrap gap-2">
-              {chatStep === 'timing'
-                ? TIMING_CHIPS.map((chip) => <Chip key={chip.id} label={chip.label} onClick={() => onTiming(chip.id as TimingId)} />)
-                : null}
-              {chatStep === 'purpose'
-                ? PURPOSE_CHIPS.map((chip) => (
-                    <Chip key={chip.id} label={chip.label} onClick={() => onPurpose(chip.id as PurposeId)} />
-                  ))
-                : null}
-              {chatStep === 'date'
-                ? DATE_CHIPS.map((chip) => <Chip key={chip.id} label={chip.label} onClick={() => onDate(chip.id)} />)
-                : null}
-            </div>
-            {showSpeech ? (
-              <div className="space-y-2">
-                <p className="text-[12px] font-semibold text-textWeak">직접 말하기</p>
-                <div className="flex flex-wrap gap-2">
-                  {['학비 반, 나머지는 이사', '내년 봄쯤 이사', '몇 년 묵혀 둘 돈'].map((label, index) => (
-                    <Chip key={label} label={label} onClick={() => setDraft(EXAMPLE_UTTERANCES[index] ?? '')} />
-                  ))}
-                </div>
-                <form
-                  className="flex gap-2"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    sendDraft();
-                  }}
-                >
-                  <input
-                    value={draft}
-                    onChange={(event) => setDraft(event.target.value)}
-                    aria-label="직접 말하기"
-                    placeholder="평소 말투로 적어 주세요"
-                    className="min-h-tap min-w-0 flex-1 rounded-button border border-line bg-surface px-3 text-sm text-textStrong"
-                  />
-                  <button type="submit" className="min-h-tap shrink-0 rounded-button bg-primary px-3 text-sm font-semibold text-white">
-                    보내기
-                  </button>
-                </form>
+          <>
+            {examples && <div className="won-chat-chips won-chat-examples">
+              {['학비 반, 나머지는 이사', '내년 봄쯤 이사', '몇 년 묵혀 둘 돈'].map((label, index) => (
+                <Chip key={label} label={label} onClick={() => {
+                  setDraft(EXAMPLE_UTTERANCES[index] ?? '');
+                  setExamples(false);
+                  inputRef.current?.focus();
+                }} />
+              ))}
+            </div>}
+            <form className="won-chat-composer" onSubmit={(event) => {
+              event.preventDefault();
+              sendDraft();
+              setExamples(false);
+            }}>
+              <button type="button" aria-label="예시 메시지" aria-expanded={examples} onClick={() => setExamples(!examples)}><Plus size={24} /></button>
+              <div>
+                <input ref={inputRef} value={draft} onChange={(event) => setDraft(event.target.value)} aria-label="직접 말하기" placeholder="메시지를 입력해 주세요" />
+                <button type="submit" disabled={!draft.trim()} aria-label="보내기"><Send size={19} /></button>
               </div>
-            ) : null}
-            {persona.id !== 'A' && persona.id !== 'D' && (chatStep === 'timing' || chatStep === 'purpose') ? (
-              <button type="button" onClick={askInvest} className="min-h-tap text-sm font-semibold text-primary">
-                투자 상품이 궁금해요
-              </button>
-            ) : null}
-          </div>
-        )
-      }
-    >
-      <div className="space-y-3">
-        {messages.map((message) => (
-          <motion.div key={message.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <ChatBubble role={message.role}>{message.text}</ChatBubble>
-          </motion.div>
-        ))}
-        {chatStep === 'interpret' && interpret ? (
-          <InterpretCard
-            items={interpret.items}
-            notes={validationNotes}
-            pickingIndex={pickingIndex}
-            onPickDate={(index, date) => {
-              answerIntentDate(index, date);
-              setPickingIndex(null);
-            }}
-            onPickTiming={(index, label) => answerIntentTiming(index, label)}
-            onAskCustomDate={setPickingIndex}
-          />
-        ) : null}
-        <div ref={bottomRef} />
-      </div>
-    </Screen>
+            </form>
+          </>
+        )}
+      </footer>
+    </div>
   );
 }

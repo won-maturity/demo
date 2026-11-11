@@ -26,7 +26,6 @@ export function HandoffPage() {
   return (
     <Screen
       title="사람 연결"
-      step={4}
       onBack={() => navigate(reason === 'RULE_QUIZ_FAIL_HANDOFF' ? '/navi/options' : '/navi/chat')}
       footer={
         <SecondaryButton

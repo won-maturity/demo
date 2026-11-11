@@ -5,13 +5,13 @@ import { useDemoStore } from '../../store/useDemoStore';
 import { useOpenMaturity } from './BankingShell';
 import type { Account } from './data';
 
-const bankLabels = { woori: '', ibk: 'IBK', kakao: 'B', hana: '하나' };
+const bankLabels = { woori: '', ibk: 'IBK', kakao: 'B', hana: '하나', kb: 'KB' };
 
 export function BankMark({ brand }: { brand: Account['brand'] }) {
   return <span className={`won-bank-mark won-bank-mark--${brand}`} aria-hidden>{bankLabels[brand]}</span>;
 }
 
-export function AccountCard({ account, notice }: { account: Account; notice?: string }) {
+export function AccountCard({ account, notice, hideBalance = false, hideAction = false }: { account: Account; notice?: string; hideBalance?: boolean; hideAction?: boolean }) {
   const openMaturity = useOpenMaturity();
   const showToast = useDemoStore((state) => state.showToast);
   const accountPath = `/assets/accounts/${account.id}`;
@@ -39,10 +39,10 @@ export function AccountCard({ account, notice }: { account: Account; notice?: st
           </button>
           {account.detail && <p className="won-account-detail">{account.detail}</p>}
           <div className="won-account-bottom">
-            <strong>{formatWon(account.amount)}</strong>
-            {account.id === 'maturity'
+            <strong>{hideBalance ? '••••••원' : formatWon(account.amount)}</strong>
+            {!hideAction && (account.id === 'maturity'
               ? <button type="button" className="won-pill" onClick={openMaturity}>{account.action}</button>
-              : <Link className="won-pill" to={account.action === '상세' ? accountPath : `${accountPath}?action=1`} aria-label={`${account.name} ${account.action}`}>{account.action}</Link>}
+              : <Link className="won-pill" to={account.action === '상세' ? accountPath : `${accountPath}?action=1`} aria-label={`${account.name} ${account.action}`}>{account.action}</Link>)}
           </div>
         </div>
       </div>

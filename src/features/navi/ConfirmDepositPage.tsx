@@ -33,7 +33,6 @@ export function ConfirmDepositPage() {
     return (
       <Screen
         title="예금 승인"
-        step={4}
         onBack={() => navigate('/navi/options')}
         footer={<PrimaryButton onClick={approveSplit}>인증 완료(데모)</PrimaryButton>}
       >
@@ -75,7 +74,6 @@ export function ConfirmDepositPage() {
   return (
     <Screen
       title="예금 승인"
-      step={4}
       onBack={() => navigate('/navi/options')}
       footer={<PrimaryButton onClick={approve}>인증 완료(데모)</PrimaryButton>}
     >

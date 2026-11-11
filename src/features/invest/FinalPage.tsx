@@ -27,7 +27,6 @@ export function FinalPage() {
   return (
     <Screen
       title="다음 날 확인"
-      step={4}
       onBack={() => navigate('/navi/invest/cooling')}
       footer={
         <>

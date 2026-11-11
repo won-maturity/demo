@@ -14,9 +14,11 @@
 
 .won-scroll {
   min-height: 0;
+  min-width: 0;
+  width: 100%;
   flex: 1 1 auto;
+  overflow-x: hidden;
   overflow-y: auto;
-  scrollbar-width: thin;
   overscroll-behavior-y: contain;
 }
 
@@ -204,6 +206,7 @@
 .won-bank-mark--ibk { background: #205a95; font-style: italic; }
 .won-bank-mark--kakao { background: #ffe100; color: #191919; font-size: 22px; }
 .won-bank-mark--hana { background: #008477; }
+.won-bank-mark--kb { background: #625b4d; color: #ffce28; }
 
 .won-account-content { flex: 1; min-width: 0; }
 .won-account-title { display: flex; min-height: 24px; align-items: start; justify-content: space-between; gap: 3px; }
