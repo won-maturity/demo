@@ -22,6 +22,8 @@ export function EnginePanel() {
   const intentConfirmed = useDemoStore((state) => state.intentConfirmed);
   const confirmedAt = useDemoStore((state) => state.confirmedAt);
   const splitLegs = useDemoStore((state) => state.splitLegs);
+  const maturityLookup = useDemoStore((state) => state.maturityLookup);
+  const investmentLookup = useDemoStore((state) => state.investmentLookup);
   const location = useLocation();
 
   if (!enabled) return null;
@@ -57,6 +59,14 @@ export function EnginePanel() {
             <p>고객을 고르면 규칙 엔진의 반환값이 여기 나타나요.</p>
           ) : (
             <>
+              <Block title="은행 조회 도구 (모의)">
+                <p>lookup_maturity_account · {maturityLookup.status}</p>
+                {maturityLookup.status === 'success' && <pre className="whitespace-pre-wrap break-all">{JSON.stringify(maturityLookup.data, null, 2)}</pre>}
+                {maturityLookup.status === 'error' && <p>{maturityLookup.message}</p>}
+                <p className="mt-2">lookup_investment_profile · {investmentLookup.status}</p>
+                {investmentLookup.status === 'success' && <pre className="whitespace-pre-wrap break-all">{JSON.stringify(investmentLookup.data, null, 2)}</pre>}
+                {investmentLookup.status === 'error' && <p>{investmentLookup.message}</p>}
+              </Block>
               <Block title="입력 가드 결과">
                 {!guard ? '아직 발화가 없어요.' : guard.ok ? '통과' : `차단 · ${guard.code}`}
               </Block>

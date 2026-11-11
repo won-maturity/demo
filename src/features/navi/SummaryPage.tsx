@@ -26,7 +26,7 @@ export function SummaryPage() {
       onBack={() => navigate('/home')}
       footer={
         <>
-          <PrimaryButton onClick={() => navigate('/navi/chat')}>용도부터 이야기해요</PrimaryButton>
+          <PrimaryButton onClick={() => navigate('/navi/chat', { state: { fromMaturity: true } })}>용도부터 이야기해요</PrimaryButton>
           <SecondaryButton onClick={() => navigate('/navi/no-response', { state: { fromSummary: true } })}>아무것도 안 하면?</SecondaryButton>
         </>
       }

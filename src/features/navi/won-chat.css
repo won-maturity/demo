@@ -50,7 +50,7 @@
 .won-chat-messages { display: grid; gap: 9px; margin: 13px 0; }
 .won-chat-message { max-width: 92%; padding: 10px 13px; border-radius: 15px; font-size: 14px; line-height: 1.53; overflow-wrap: anywhere; }
 .won-chat-message--ai { justify-self: start; border-top-left-radius: 4px; background: white; }
-.won-chat-message--user { justify-self: end; border-top-right-radius: 4px; background: #e3edfd; }
+.won-chat-message--user { justify-self: end; border-top-right-radius: 4px; background: #e3edfd; white-space: pre-line; }
 .won-chat-chips { display: flex; flex-wrap: wrap; gap: 7px; }
 .won-chat-chips button { min-height: 34px; border: 0; background: #e4edfc; color: #38444e; font-size: 13px; }
 .won-chat-guide { display: grid; gap: 7px; margin-top: 17px; border-radius: 20px; background: white; padding: 20px; box-shadow: 0 2px 3px #29385013; }
@@ -68,3 +68,61 @@
 .won-chat-composer input { flex: 1; min-width: 0; min-height: 44px; padding-left: 12px; border-radius: 9px; background: transparent; font-size: 14px; }
 .won-chat-composer input::placeholder { color: theme('colors.textWeak'); }
 .won-chat :is(button, input):focus-visible { outline: 2px solid theme('colors.primary'); outline-offset: -2px; }
+
+.won-chat-typing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 9px 0 13px;
+  color: theme('colors.textWeak');
+  font-size: 12px;
+}
+.won-chat-typing-dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  gap: 4px;
+  padding: 0 12px;
+  border-radius: 4px 14px 14px;
+  background: white;
+}
+.won-chat-typing-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: theme('colors.visualBlue');
+  animation: won-chat-thinking 1.2s ease-in-out infinite;
+}
+.won-chat-typing-dots i:nth-child(2) { animation-delay: .16s; }
+.won-chat-typing-dots i:nth-child(3) { animation-delay: .32s; }
+.won-chat-chips:disabled { opacity: .6; }
+.won-chat-composer input:read-only { color: theme('colors.textWeak'); }
+@keyframes won-chat-thinking {
+  0%, 65%, 100% { opacity: .4; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .won-chat-typing-dots i { animation: none; opacity: .75; }
+}
+
+.won-bank-lookup { padding: 14px; border: 1px solid #d9e5f2; border-radius: 16px; background: white; }
+.won-bank-lookup header { display: flex; align-items: center; gap: 5px; color: theme('colors.primary'); }
+.won-bank-lookup h2 { font-size: 14px; font-weight: 760; }
+.won-bank-lookup header small { margin-left: auto; padding: 2px 5px; border-radius: 999px; background: #eff3f7; color: theme('colors.textWeak'); font-size: 10px; font-weight: 650; }
+.won-bank-lookup-status { display: flex; align-items: center; gap: 7px; min-height: 45px; padding-top: 8px; color: theme('colors.textBody'); font-size: 13px; }
+.won-bank-lookup-spinner { flex-shrink: 0; color: theme('colors.primary'); animation: won-bank-lookup-spin 1s linear infinite; }
+.won-bank-lookup-product { display: flex; align-items: center; gap: 5px; margin-top: 9px; color: theme('colors.textBody'); font-size: 13px; font-weight: 680; }
+.won-bank-lookup-product svg { color: theme('colors.successText'); }
+.won-bank-lookup dl { display: grid; gap: 8px; margin-top: 12px; }
+.won-bank-lookup dl > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; }
+.won-bank-lookup dt { color: theme('colors.textBody'); }
+.won-bank-lookup dt small { display: block; font-size: 10px; }
+.won-bank-lookup dd { font-weight: 730; text-align: right; }
+.won-bank-lookup-source { margin-top: 12px; border-top: 1px solid theme('colors.line'); padding-top: 8px; color: theme('colors.textWeak'); font-size: 11px; }
+.won-bank-lookup-error { display: grid; gap: 10px; padding-top: 13px; }
+.won-bank-lookup-error p { display: flex; align-items: start; gap: 6px; color: theme('colors.dangerText'); font-size: 13px; }
+.won-bank-lookup-error svg { flex-shrink: 0; margin-top: 2px; }
+.won-bank-lookup-error button { min-height: 38px; border: 1px solid theme('colors.line'); border-radius: 9px; font-size: 13px; font-weight: 700; color: theme('colors.primary'); }
+@keyframes won-bank-lookup-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .won-bank-lookup-spinner { animation: none; } }
