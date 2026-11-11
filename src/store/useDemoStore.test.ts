@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { getPersona } from '../mock/personas';
+import { estimateHorizon, getEligibleOptions } from '../engine/rules';
 import { useDemoStore } from './useDemoStore';
 
 describe('bank lookup conversation', () => {
@@ -10,6 +12,40 @@ describe('bank lookup conversation', () => {
   afterEach(() => {
     vi.clearAllTimers();
     vi.useRealTimers();
+  });
+
+  it('runs the tuition and moving persona through clarification and customer confirmation before building two deposits', async () => {
+    const store = useDemoStore.getState();
+    store.selectPersona('E');
+    const persona = getPersona('E');
+    const request = store.startMaturityChat();
+    await vi.runAllTimersAsync();
+    await request;
+    expect(useDemoStore.getState().maturityLookup).toMatchObject({ status: 'success', data: { customerName: '정하늘', principal: 30_000_000 } });
+    store.submitUtterance(persona.scenario!.utterance);
+    let state = useDemoStore.getState();
+    expect(state.interpret?.items).toMatchObject([
+      { purpose: 'TUITION', amount: 15_000_000, date: '2027-05-20', certainty: 'CONFIRMED' },
+      { purpose: 'MOVING', amount: 15_000_000, timeText: '내년 봄쯤', certainty: 'NEEDS_CONFIRM' },
+    ]);
+    expect(state.messages.at(-1)?.text).toContain('3월 말로 보면 될까요');
+    expect(store.confirmIntent()).toBe(false);
+    expect(state.splitLegs).toBeNull();
+    store.answerIntentDate(1, '2027-03-31');
+    expect(useDemoStore.getState().splitLegs).toBeNull();
+    expect(useDemoStore.getState().intentConfirmed).toBe(false);
+    expect(store.confirmIntent()).toBe(true);
+    await store.prepareChatOptions();
+    state = useDemoStore.getState();
+    expect(state.chatStep).toBe('closing');
+    expect(state.splitLegs).toMatchObject([
+      { purpose: 'TUITION', amount: 15_000_000, date: '2027-05-20', productId: 'super-deposit' },
+      { purpose: 'MOVING', amount: 15_000_000, date: '2027-03-31', productId: 'super-deposit' },
+    ]);
+    const horizon = estimateHorizon(state.answers);
+    const choices = getEligibleOptions(persona, horizon.horizon, horizon.useDate, { split: true });
+    expect(choices.appliedRules).toContain('RULE_SPLIT_BY_PURPOSE');
+    expect(choices.options.every((option) => option.kind !== 'invest')).toBe(true);
   });
 
   it('shows the introduction and loading state before exposing bank data and an acknowledgement', async () => {
