@@ -17,6 +17,8 @@ export function LauncherPage() {
   const selectPersona = useDemoStore((state) => state.selectPersona);
   const engineOn = useDemoStore((state) => state.enginePanelEnabled);
   const setEngine = useDemoStore((state) => state.setEnginePanelEnabled);
+  const lookupFailureOnce = useDemoStore((state) => state.lookupFailureOnce);
+  const setLookupFailureOnce = useDemoStore((state) => state.setLookupFailureOnce);
 
   return (
     <div className="h-full overflow-y-auto bg-bg px-5 py-5">
@@ -61,6 +63,17 @@ export function LauncherPage() {
         ))}
       </div>
       <div className="mt-4 space-y-2 pb-4">
+        <label className="block rounded-card bg-surface p-4 text-sm font-semibold text-textStrong">
+          조회 실패 시연
+          <select className="mt-2 min-h-tap w-full rounded-button border border-line px-3"
+            value={lookupFailureOnce}
+            onChange={(event) => setLookupFailureOnce(event.target.value as 'none' | 'maturity' | 'investment')}>
+            <option value="none">정상 조회</option>
+            <option value="maturity">다음 만기 조회 1회 실패</option>
+            <option value="investment">다음 투자성향 조회 1회 실패</option>
+          </select>
+          <span className="mt-2 block text-xs font-normal text-textBody">설정 후 시연 고객을 다시 선택하면 새 조회로 시작합니다.</span>
+        </label>
         <SecondaryButton onClick={() => navigate('/simulator', { state: { fromDemo: true } })}>수익성 시뮬레이터 보기</SecondaryButton>
         <SecondaryButton onClick={() => navigate('/navi/no-response', { state: { fromDemo: true } })}>무응답이면 어떻게 되나요</SecondaryButton>
         <button
