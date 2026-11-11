@@ -6,19 +6,40 @@ export type CatalogProduct = {
   summary: string;
   annualRate: number | null;
   rateText: string;
-  isExample: true;
+  isExample: boolean;
+  officialUrl?: string;
+  officialCheckedAt?: string;
+  ticker?: string;
+  feeText?: string;
   principalGuaranteed: boolean;
   riskLabel: string;
   riskTone: 'safe' | 'caution' | 'danger';
   kind: ProductKind;
-  worstLossRate?: number;
-  feeRate?: number;
+  provider?: string;
 };
 
 export const REDEPOSIT_ID = 'redeposit';
-export const INVEST_ID = 'virtual-bond-mix';
+export const INVEST_ID = 'woori-securities-rp-cma';
+export const ETF_PORTFOLIO_ID = 'won-sp500-etf';
 
 export const PRODUCTS: CatalogProduct[] = [
+  {
+    id: ETF_PORTFOLIO_ID,
+    name: 'WON 미국S&P500',
+    provider: '우리자산운용',
+    ticker: '444490',
+    officialUrl: 'https://www.wooriam.kr/investment/etf-view/6acWapbyV1JaJ7do',
+    officialCheckedAt: '2026-11-11',
+    summary: '미국 S&P 500 지수(원화환산)의 움직임을 따르는 주식형 ETF예요. 주가와 환율에 따라 손실이 날 수 있어요.',
+    annualRate: null,
+    rateText: '시장 가격에 따라 변동',
+    isExample: false,
+    principalGuaranteed: false,
+    riskLabel: '높은 위험',
+    riskTone: 'danger',
+    kind: 'invest',
+    feeText: '공식 안내상 총보수는 연 0.05%예요. 기타비용과 매매수수료가 추가될 수 있어 최신 투자설명서와 거래 증권사의 조건을 확인해 주세요.',
+  },
   {
     id: REDEPOSIT_ID,
     name: '지금 예금 그대로 재예치',
@@ -69,19 +90,23 @@ export const PRODUCTS: CatalogProduct[] = [
   },
   {
     id: INVEST_ID,
-    name: '가상 채권혼합형 펀드 A',
-    summary: '채권과 주식을 섞은 가상 투자 상품이에요. 원금이 줄 수 있어요.',
+    name: 'RP형 CMA',
+    provider: '우리투자증권',
+    officialUrl: 'https://fundsupermarket.wooriib.com/repository/fok/contractTerms/2026030619cc2c4ad48150.pdf',
+    officialCheckedAt: '2026-11-11',
+    summary: '계좌 예탁금으로 RP를 자동 매수하는 수시입출금 상품이에요. 예금이 아니며 원금 손실이 날 수 있어요.',
     annualRate: null,
-    rateText: '과거 1년 수익률 4.80%',
-    isExample: true,
+    rateText: '회사 고시 약정수익률 · 변동 가능',
+    isExample: false,
     principalGuaranteed: false,
-    riskLabel: '중간위험',
+    riskLabel: '5등급 · 낮은 위험',
     riskTone: 'caution',
     kind: 'invest',
-    worstLossRate: 0.12,
-    feeRate: 0.005,
+    feeText: '공식 RP 상품설명서상 거래에 따른 별도 비용은 부과되지 않아요.',
   },
 ];
+
+export const AFFILIATE_PRODUCTS = PRODUCTS.filter((product) => Boolean(product.officialUrl));
 
 export const HOUSING_INFO = [
   {

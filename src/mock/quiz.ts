@@ -21,7 +21,7 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'bank', label: '은행이 손실을 채워 줘요', correct: false },
     ],
     explain:
-      '가상 채권혼합형 펀드 A는 예금이 아니에요. 가격이 내리면 넣은 돈보다 적어질 수 있어요.',
+      '이 투자 상품은 예금이 아니에요. 가격이 내리면 넣은 돈보다 적어질 수 있어요.',
   },
   {
     id: 'today',

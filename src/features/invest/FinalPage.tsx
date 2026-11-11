@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ExampleValue } from '../../components/ui/AmountText';
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
 import { PrimaryButton, SecondaryButton } from '../../components/ui/Buttons';
 import { Screen } from '../../components/ui/Screen';
-import { formatManWon } from '../../lib/format';
-import { getPersona } from '../../mock/personas';
-import { REDEPOSIT_ID, getProduct, INVEST_ID } from '../../mock/products';
+import { OfficialProductSource } from '../../components/ui/OfficialProductSource';
+import { REDEPOSIT_ID, getProduct } from '../../mock/products';
 import { useDemoStore } from '../../store/useDemoStore';
 
 export function FinalPage() {
   const navigate = useNavigate();
   const personaId = useDemoStore((state) => state.personaId);
+  const selectedProductId = useDemoStore((state) => state.selectedProductId);
   const approved = useDemoStore((state) => state.invest.finalApproved);
   const markInvest = useDemoStore((state) => state.markInvest);
   const addConsent = useDemoStore((state) => state.addConsent);
@@ -20,9 +19,7 @@ export function FinalPage() {
   const selectProduct = useDemoStore((state) => state.selectProduct);
   const [ready, setReady] = useState(approved);
   if (!personaId) return null;
-  const persona = getPersona(personaId);
-  const product = getProduct(INVEST_ID);
-  const worst = Math.round(persona.principal * (product.worstLossRate ?? 0));
+  const product = getProduct(selectedProductId);
 
   return (
     <Screen
@@ -33,13 +30,13 @@ export function FinalPage() {
           {ready ? (
             <PrimaryButton
               onClick={() => {
-                addConsent('다음 날 최종 승인 뒤 인증 완료(데모)로 가입했어요.');
+                addConsent('다음 날 최종 승인 뒤 투자 상품 선택 시연을 완료했어요.');
                 markInvest('finalApproved');
-                complete('invest', INVEST_ID);
+                complete('invest', selectedProductId);
                 navigate('/navi/done');
               }}
             >
-              인증 완료(데모)
+              선택 완료(데모)
             </PrimaryButton>
           ) : (
             <PrimaryButton
@@ -73,11 +70,12 @@ export function FinalPage() {
         </div>
         <h3 className="mt-2 text-lg font-bold text-textStrong">{product.name}</h3>
         <p className="mt-2 text-sm leading-6 text-textBody">
-          과거 기준 최악의 경우 약 <ExampleValue>{formatManWon(worst)}</ExampleValue> 손실이 날 수 있어요.
+          원금의 일부 또는 전부를 잃을 수 있어요. 실제 가입·매매는 해당 금융회사에서 진행해요.
         </p>
         <div className="mt-2">
-          <ExampleValue>{product.rateText}</ExampleValue>
+          <p className="text-sm font-semibold text-textStrong">{product.rateText}</p>
         </div>
+        <OfficialProductSource url={product.officialUrl} provider={product.provider} checkedAt={product.officialCheckedAt} />
         <p className="mt-3 text-sm leading-6 text-textBody">답이 없으면 재예치로 진행돼요.</p>
       </Card>
     </Screen>

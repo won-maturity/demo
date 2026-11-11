@@ -1,0 +1,23 @@
+.won-ai-gallery { display: flex; flex-direction: column; height: 100%; min-height: 0; background: #f5f6f8; color: theme('colors.textStrong'); }
+.won-ai-gallery-header { position: relative; display: grid; place-items: center; min-height: 54px; flex-shrink: 0; background: white; }
+.won-ai-gallery-header h1 { font-size: 18px; font-weight: 760; letter-spacing: -.04em; }
+.won-ai-gallery-header button { position: absolute; right: 12px; display: grid; place-items: center; width: 44px; height: 44px; }
+.won-ai-gallery-content { min-width: 0; min-height: 0; flex: 1; overflow-x: hidden; overflow-y: auto; padding: 16px 20px 24px; }
+.won-ai-gallery-group { margin-bottom: 16px; border-radius: 21px; padding: 17px 20px 13px; background: white; box-shadow: 0 1px 2px #274d7920; }
+.won-ai-gallery-group summary { display: flex; align-items: start; justify-content: space-between; gap: 7px; list-style: none; cursor: pointer; }
+.won-ai-gallery-group summary::-webkit-details-marker { display: none; }
+.won-ai-gallery-group summary strong, .won-ai-gallery-group summary small { display: block; }
+.won-ai-gallery-group summary strong { font-size: 17px; font-weight: 760; line-height: 1.4; letter-spacing: -.05em; }
+.won-ai-gallery-group summary em { color: theme('colors.primary'); font-style: normal; }
+.won-ai-gallery-group summary small { color: theme('colors.textWeak'); font-size: 13px; line-height: 1.45; letter-spacing: -.03em; }
+.won-ai-gallery-group summary > svg { flex-shrink: 0; margin-top: 2px; }
+.won-ai-gallery-group:not([open]) summary > svg { transform: rotate(180deg); }
+.won-ai-gallery-group nav { margin-top: 15px; }
+.won-ai-gallery-group nav a { display: flex; align-items: center; gap: 15px; min-height: 45px; font-size: 16px; font-weight: 650; letter-spacing: -.035em; }
+.won-ai-gallery-group nav a > svg { margin-left: auto; color: theme('colors.textWeak'); }
+.won-ai-gallery-icon { display: grid; place-items: center; width: 26px; height: 29px; flex-shrink: 0; }
+.won-ai-gallery-icon svg { fill: currentColor; fill-opacity: .2; stroke-width: 2.2; }
+.won-ai-gallery-icon--cyan { color: #2495ad; }.won-ai-gallery-icon--pink { color: #ec7eae; }.won-ai-gallery-icon--purple { color: #a24ada; }.won-ai-gallery-icon--blue { color: #3485e4; }.won-ai-gallery-icon--indigo { color: #6379ec; }.won-ai-gallery-icon--orange { color: #f5791a; }.won-ai-gallery-icon--gray { color: #7c858e; }.won-ai-gallery-icon--mint { color: #26bca0; }
+.won-ai-gallery :is(a,button,summary):focus-visible { outline: 2px solid theme('colors.primary'); outline-offset: 2px; border-radius: 5px; }
+.won-chat-header .won-chat-gallery-trigger { justify-self: end; justify-items: end; width: 44px; min-height: 44px; }
+@media(max-width:350px) { .won-ai-gallery-content { padding-inline: 13px; }.won-ai-gallery-group { padding-inline: 16px; }.won-ai-gallery-group nav a { gap: 10px; font-size: 15px; } }

@@ -52,7 +52,6 @@ type DemoState = {
   quizIndex: number;
   quizExplain: string | null;
   invest: InvestFlags;
-  diagnosisRenewed: boolean;
   explainChecked: ExplainChecks;
   handoffReason?: RuleId;
   handoffNote: string | null;
@@ -75,6 +74,7 @@ type DemoState = {
   setLookupFailureOnce: (target: 'none' | 'maturity' | 'investment') => void;
   startMaturityChat: () => Promise<void>;
   prepareChatOptions: () => Promise<void>;
+  fetchInvestmentContext: () => Promise<void>;
   setEnginePanelEnabled: (on: boolean) => void;
   setEnginePanelExpanded: (on: boolean) => void;
   setAutoRedeposit: (on: boolean) => void;
@@ -87,7 +87,6 @@ type DemoState = {
   setQuizExplain: (text: string) => void;
   advanceQuiz: () => void;
   markInvest: (flag: keyof InvestFlags) => void;
-  renewDiagnosis: () => void;
   toggleExplain: (key: keyof ExplainChecks) => void;
   setHandoff: (reason: RuleId) => void;
   setHandoffNote: (note: string) => void;
@@ -146,7 +145,6 @@ export const useDemoStore = create<DemoState>((set, get) => ({
   quizIndex: 0,
   quizExplain: null,
   invest: emptyInvest(),
-  diagnosisRenewed: false,
   explainChecked: emptyChecks(),
   handoffNote: null,
   completion: null,
@@ -177,8 +175,7 @@ export const useDemoStore = create<DemoState>((set, get) => ({
       quizIndex: 0,
       quizExplain: null,
       invest: emptyInvest(),
-      diagnosisRenewed: false,
-      explainChecked: emptyChecks(),
+          explainChecked: emptyChecks(),
       handoffReason: undefined,
       handoffNote: null,
       completion: null,
@@ -199,84 +196,89 @@ export const useDemoStore = create<DemoState>((set, get) => ({
     const state = get();
     const { personaId } = state;
     if (!personaId || state.maturityLookup.status === 'loading') return;
-    if (state.maturityLookup.status === 'success' && state.maturityLookup.data.autoRedeposit === state.autoRedeposit) return;
+    const maturityCached = state.maturityLookup.status === 'success' && state.maturityLookup.data.autoRedeposit === state.autoRedeposit;
+    if (maturityCached && state.investmentLookup.status === 'success') return;
     const openingMessage = state.messages[0];
-    const introduction: ChatMessage = {
-      id: 'maturity-introduction', role: 'ai',
-      text: '안녕하세요. 우리은행 만기 자금 상담 AI입니다.',
-    };
-    const messages = state.messages.filter((message) => !['maturity-context', 'maturity-acknowledgement'].includes(message.id));
-    if (!messages.some((message) => message.id === introduction.id)) messages.push(introduction);
-    if (!messages.some((message) => message.kind === 'maturity-lookup')) {
-      messages.push({ id: 'maturity-lookup', role: 'ai', text: '', kind: 'maturity-lookup' });
-    }
-    const fail = state.lookupFailureOnce === 'maturity';
-    set({
-      messages,
-      maturityLookup: { status: 'loading' },
-      lookupFailureOnce: fail ? 'none' : state.lookupFailureOnce,
-    });
-    try {
-      const data = await lookupMaturityAccount({ personaId, autoRedeposit: state.autoRedeposit, fail });
-      if (get().messages[0] !== openingMessage || get().personaId !== personaId) return;
-      // A setting changed during the request. Fetch its current value before acknowledging it.
-      if (get().autoRedeposit !== data.autoRedeposit) {
-        set({ maturityLookup: { status: 'idle' } });
-        await get().startMaturityChat();
+    if (!maturityCached) {
+      const messages = state.messages.filter((message) => !['maturity-context', 'maturity-acknowledgement'].includes(message.id));
+      if (!messages.some((message) => message.id === 'maturity-introduction')) {
+        messages.push({ id: 'maturity-introduction', role: 'ai', text: '안녕하세요. 우리은행 만기 자금 상담 AI입니다.' });
+      }
+      if (!messages.some((message) => message.kind === 'maturity-lookup')) {
+        messages.push({ id: 'maturity-lookup', role: 'ai', text: '', kind: 'maturity-lookup' });
+      }
+      const fail = state.lookupFailureOnce === 'maturity';
+      set({ messages, maturityLookup: { status: 'loading' }, lookupFailureOnce: fail ? 'none' : state.lookupFailureOnce });
+      try {
+        const data = await lookupMaturityAccount({ personaId, autoRedeposit: state.autoRedeposit, fail });
+        if (get().messages[0] !== openingMessage || get().personaId !== personaId) return;
+        if (get().autoRedeposit !== data.autoRedeposit) {
+          set({ maturityLookup: { status: 'idle' } });
+          await get().startMaturityChat();
+          return;
+        }
+        set({ maturityLookup: { status: 'success', data } });
+        get().appendMessage('ai', `${data.customerName}님, ${formatWon(data.principal)}이 ${formatDotDate(data.maturityDate)}에 만기네요. 자동 재예치는 ${data.autoRedeposit ? '켜져' : '꺼져'} 있어요.`);
+      } catch {
+        if (get().messages[0] !== openingMessage || get().personaId !== personaId) return;
+        set({ maturityLookup: { status: 'error', message: '만기 상품 정보를 불러오지 못했어요. 다시 조회해 주세요.' } });
         return;
       }
-      set({ maturityLookup: { status: 'success', data } });
-      const nextQuestion: Record<ChatStep, string> = {
-        timing: '이 돈은 언제 쓰실 예정이세요?',
-        purpose: '어디에 쓰실 돈이에요?',
-        date: '사용할 날짜가 정해져 있다면 알려 주세요.',
-        interpret: '앞서 말씀하신 용도와 날짜가 맞는지 확인해 주세요.',
-        closing: '앞서 말씀해 주신 용도에 맞는 선택지를 확인해 보세요.',
-        handoff: '지금까지 상담한 내용을 전문가에게 이어드릴게요.',
-      };
-      get().appendMessage('ai',
-        `${data.customerName}님, ${formatWon(data.principal)}이 ${formatDotDate(data.maturityDate)}에 만기네요. 자동 재예치는 ${data.autoRedeposit ? '켜져' : '꺼져'} 있어요. ${nextQuestion[get().chatStep]}`);
+    }
+    await get().fetchInvestmentContext();
+    if (get().messages[0] !== openingMessage || get().investmentLookup.status !== 'success') return;
+    const nextQuestion: Record<ChatStep, string> = {
+      timing: '이 돈은 언제 쓰실 예정이세요?',
+      purpose: '어디에 쓰실 돈이에요?',
+      date: '사용할 날짜가 정해져 있다면 알려 주세요.',
+      interpret: '앞서 말씀하신 용도와 날짜가 맞는지 확인해 주세요.',
+      closing: '앞서 말씀해 주신 용도에 맞는 선택지를 확인해 보세요.',
+      handoff: '지금까지 상담한 내용을 전문가에게 이어드릴게요.',
+    };
+    get().appendMessage('ai', nextQuestion[get().chatStep]);
+  },
+  fetchInvestmentContext: async () => {
+    const state = get();
+    if (!state.personaId || state.investmentLookup.status === 'loading' || state.investmentLookup.status === 'success') return;
+    const openingMessage = state.messages[0];
+    const messages = [...state.messages];
+    if (!messages.some((message) => message.kind === 'investment-lookup')) {
+      messages.push({ id: 'investment-lookup', role: 'ai', text: '', kind: 'investment-lookup' });
+    }
+    const fail = state.lookupFailureOnce === 'investment';
+    set({ messages, investmentLookup: { status: 'loading' }, lookupFailureOnce: fail ? 'none' : state.lookupFailureOnce });
+    try {
+      const data = await lookupInvestmentProfile({ personaId: state.personaId, fail });
+      if (get().messages[0] !== openingMessage || get().personaId !== state.personaId) return;
+      set({ investmentLookup: { status: 'success', data } });
+      const preference = data.investmentPreference === 'declines'
+        ? '투자를 원하지 않는 것으로 등록되어 있어 예금 범위에서 안내할게요.'
+        : data.riskProfile === '적극투자형'
+          ? '사용할 시점이 맞으면 증권사 상품도 함께 비교할 수 있어요.'
+          : '등록된 성향에 맞춰 예금 위주로 안내할게요.';
+      get().appendMessage('ai', `기존 진단 결과는 ${data.riskProfile}이고, 포트폴리오 분석 요약도 가져왔어요. ${preference}`);
     } catch {
-      if (get().messages[0] !== openingMessage || get().personaId !== personaId) return;
-      set({ maturityLookup: { status: 'error', message: '만기 상품 정보를 불러오지 못했어요. 다시 조회해 주세요.' } });
+      if (get().messages[0] !== openingMessage || get().personaId !== state.personaId) return;
+      set({ investmentLookup: { status: 'error', message: '기존 투자성향과 포트폴리오 분석을 가져오지 못했어요. 다시 조회해 주세요.' } });
     }
   },
   prepareChatOptions: async () => {
     const state = get();
     if (!state.personaId || state.investmentLookup.status === 'loading' || state.chatStep === 'closing') return;
-    const persona = getPersona(state.personaId);
     const openingMessage = state.messages[0];
-    const estimated = estimateHorizon(state.answers);
-    let choice = getEligibleOptions(persona, estimated.horizon, estimated.useDate, { purpose: state.answers.purpose });
-    if (choice.options.some((option) => option.kind === 'invest')) {
-      let profile: InvestmentProfile;
-      if (state.investmentLookup.status === 'success' && state.investmentLookup.data.renewed === state.diagnosisRenewed) {
-        profile = state.investmentLookup.data;
-      } else {
-        const messages = [...state.messages];
-        if (!messages.some((message) => message.kind === 'investment-lookup')) {
-          messages.push({ id: 'investment-lookup', role: 'ai', text: '', kind: 'investment-lookup' });
-        }
-        const fail = state.lookupFailureOnce === 'investment';
-        set({
-          messages,
-          investmentLookup: { status: 'loading' },
-          lookupFailureOnce: fail ? 'none' : state.lookupFailureOnce,
-        });
-        try {
-          profile = await lookupInvestmentProfile({ personaId: state.personaId, renewed: state.diagnosisRenewed, fail });
-          if (get().messages[0] !== openingMessage || get().personaId !== state.personaId) return;
-          set({ investmentLookup: { status: 'success', data: profile } });
-        } catch {
-          if (get().messages[0] !== openingMessage || get().personaId !== state.personaId) return;
-          set({ investmentLookup: { status: 'error', message: '투자성향 정보를 불러오지 못했어요. 다시 조회해 주세요.' } });
-          return;
-        }
-      }
-      choice = getEligibleOptions({ ...persona, riskProfile: profile.riskProfile }, estimated.horizon, estimated.useDate, { purpose: state.answers.purpose });
-      get().appendMessage('ai', `등록된 투자성향은 ${profile.riskProfile}으로 확인돼요. ${profile.diagnosis.state === 'valid'
-        ? '진단은 유효 기간 안에 있어요.'
-        : '진단이 유효하지 않아 투자 상품 진행 전 재진단이 필요해요.'}`);
+    await get().fetchInvestmentContext();
+    if (get().messages[0] !== openingMessage) return;
+    const lookup = get().investmentLookup;
+    if (lookup.status !== 'success') return;
+    const persona = getPersona(state.personaId);
+    const estimated = estimateHorizon(get().answers);
+    const choice = getEligibleOptions({
+      ...persona,
+      riskProfile: lookup.data.riskProfile,
+      investmentPreference: lookup.data.investmentPreference,
+    }, estimated.horizon, estimated.useDate, { purpose: get().answers.purpose });
+    if (choice.options.some((option) => option.kind === 'invest') && lookup.data.diagnosis.state !== 'valid') {
+      get().appendMessage('ai', '가져온 진단이 유효하지 않아 투자 상품 진행 전 외부 서비스에서 진단을 갱신해야 해요.');
     }
     get().appendMessage('ai', `${choice.heard} ${choice.decision}`);
     set({ chatStep: 'closing' });
@@ -290,7 +292,10 @@ export const useDemoStore = create<DemoState>((set, get) => ({
   },
   setChatStep: (step) => set({ chatStep: step }),
   setAnswers: (patch) => set({ answers: { ...get().answers, ...patch }, selectedProductId: REDEPOSIT_ID }),
-  selectProduct: (productId) => set({ selectedProductId: productId }),
+  selectProduct: (productId) => {
+    if (get().selectedProductId === productId) return;
+    set({ selectedProductId: productId, invest: emptyInvest(), explainChecked: emptyChecks(), quizFails: {}, quizIndex: 0, quizExplain: null, completion: null });
+  },
   missQuiz: (questionId) => {
     const next = (get().quizFails[questionId] ?? 0) + 1;
     set({ quizFails: { ...get().quizFails, [questionId]: next } });
@@ -300,7 +305,6 @@ export const useDemoStore = create<DemoState>((set, get) => ({
   setQuizExplain: (text) => set({ quizExplain: text }),
   advanceQuiz: () => set({ quizIndex: get().quizIndex + 1, quizExplain: null }),
   markInvest: (flag) => set({ invest: { ...get().invest, [flag]: true } }),
-  renewDiagnosis: () => set({ diagnosisRenewed: true }),
   toggleExplain: (key) =>
     set({ explainChecked: { ...get().explainChecked, [key]: !get().explainChecked[key] } }),
   setHandoff: (reason) => set({ handoffReason: reason, investInquiry: reason === 'RULE_ELDERLY_HANDOFF' ? true : get().investInquiry }),

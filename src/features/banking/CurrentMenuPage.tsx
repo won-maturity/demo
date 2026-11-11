@@ -21,7 +21,7 @@ const sections = [
     ['전체계좌조회', '/assets/accounts'], ['자산·소비', '/assets'], ['저축진단', '/savings'], ['소비 내역', '/spending'],
   ] },
   { label: '금융상품/상담', icon: BadgeCheck, links: [
-    ['상품몰', '/banking'], ['주식', '/stocks'], ['혜택', '/benefits'], ['유니버설뱅킹', '/banking/universal'],
+    ['상품몰', '/banking'], ['우리금융그룹 상품', '/banking/affiliates'], ['주식', '/stocks'], ['혜택', '/benefits'], ['유니버설뱅킹', '/banking/universal'],
     ['AI챗봇', '/maturity/chat'], ['WON하는 만기', '/maturity'], ['알림', '/notifications'],
   ] },
   { label: '시연 메뉴', icon: UserCircle, links: [

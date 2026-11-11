@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 
 export function PhoneFrame({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
-  const whiteStatusBar = pathname === '/savings' || pathname === '/menu' || pathname.startsWith('/navi/');
+  const whiteStatusBar = pathname === '/savings' || pathname === '/menu' || pathname.startsWith('/ai-gallery') || pathname.startsWith('/navi/');
 
   return (
     <div className="min-h-dvh bg-stage frame:flex frame:min-h-dvh frame:items-center frame:justify-center frame:p-5">

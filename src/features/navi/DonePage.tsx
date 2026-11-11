@@ -33,7 +33,7 @@ export function DonePage() {
     completion.via === 'no-response'
       ? '응답이 없어 재예치로 진행했어요.'
       : completion.via === 'invest'
-        ? '투자 상품 가입까지 마쳤어요.'
+        ? '투자 상품 선택 시연을 마쳤어요.'
         : completion.via === 'split'
           ? '쓰는 날에 맞춰 예금 두 건으로 나눴어요.'
           : '예금 쪽으로 실행을 마쳤어요.';
