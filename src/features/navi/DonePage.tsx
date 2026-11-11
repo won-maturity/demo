@@ -103,7 +103,7 @@ export function DonePage() {
       title="완료와 기록"
       step={5}
       onBack={() => navigate('/home')}
-      footer={<SecondaryButton onClick={() => navigate('/')}>다른 고객 시연</SecondaryButton>}
+      footer={<SecondaryButton onClick={() => navigate('/demo')}>다른 고객 시연</SecondaryButton>}
     >
       <h2 className="text-xl font-bold leading-7 text-textStrong">{headline}</h2>
       <p className="mt-2 text-sm leading-6 text-textBody">

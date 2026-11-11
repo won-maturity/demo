@@ -1,0 +1,458 @@
+.won-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  color: theme('colors.textStrong');
+  background: linear-gradient(180deg, theme('colors.bg') 0%, theme('colors.bg') 18%, theme('colors.appSky') 66%);
+}
+
+.won-shell :is(button, a, summary):focus-visible {
+  outline: 2px solid theme('colors.primary');
+  outline-offset: -2px;
+}
+
+.won-scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  overscroll-behavior-y: contain;
+}
+
+.won-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 54px;
+  padding: 0 16px;
+  flex-shrink: 0;
+}
+
+.won-header--centered {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  text-align: center;
+}
+
+.won-header--centered h1 { grid-column: 2; }
+.won-header--centered .won-header-actions { grid-column: 3; }
+.won-header-back { grid-column: 1; grid-row: 1; }
+
+.won-header h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -.045em;
+}
+
+.won-header-actions { display: flex; align-items: center; margin-right: -5px; }
+.won-icon-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: theme('borderRadius.chip');
+}
+
+.won-home-header h1 a { text-decoration: underline; text-underline-offset: 5px; }
+.won-notification-icon::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: theme('colors.dangerText');
+}
+
+.won-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  flex-shrink: 0;
+  background: theme('colors.surface');
+  border-top: 1px solid theme('colors.line');
+  padding: 2px 8px max(2px, env(safe-area-inset-bottom));
+}
+
+.won-tabs a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 45px;
+  gap: 3px;
+  border-radius: 8px;
+  color: theme('colors.textBody');
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.won-tabs a[aria-current], .won-tabs .won-tab-context { color: theme('colors.primary'); font-weight: 750; }
+.won-home, .won-page { padding: 16px 16px 26px; }
+.won-page h2, .won-page h3 { font-weight: 750; letter-spacing: -.035em; }
+.won-page h2 { font-size: 18px; line-height: 1.35; }
+.won-muted { color: theme('colors.textWeak'); }
+.won-negative { color: theme('colors.dangerText'); }
+
+.won-home-feature { margin: 13px 3px 42px; }
+.won-hero-link {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 5px;
+  text-align: left;
+  border-radius: 8px;
+}
+.won-hero-copy {
+  display: block;
+  min-width: 0;
+  font-size: clamp(18px, 5.8vw, 23px);
+  font-weight: 750;
+  line-height: 1.27;
+  letter-spacing: -.05em;
+  word-break: keep-all;
+}
+.won-hero-copy svg { display: inline; vertical-align: -.18em; }
+.won-hero-accent { color: theme('colors.primary'); font-weight: inherit; }
+
+.won-alert-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 58px;
+  height: 58px;
+  margin: -2px 6px 0 2px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 20%, #9adfff 0, #56adff 37%, #1685f1 77%);
+  box-shadow: inset 5px -5px 0 #77c7fd, inset -3px 4px 6px #bddfff;
+  color: white;
+  font-size: 35px;
+  line-height: 1;
+  font-weight: 800;
+}
+.won-alert-art::after {
+  content: '';
+  position: absolute;
+  right: 16px;
+  bottom: -7px;
+  width: 13px;
+  height: 13px;
+  background: #4faaf6;
+  clip-path: polygon(34% 0, 100% 0, 0 100%);
+}
+
+.won-hero-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.won-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 12px;
+  min-height: 36px;
+  border: 1px solid #cbd5de;
+  border-radius: theme('borderRadius.chip');
+  color: theme('colors.textBody');
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+}
+.won-hero-actions .won-pill, .won-section-heading .won-pill { min-height: 40px; }
+.won-pill-primary { color: theme('colors.primary'); border-color: #aeccee; background: #ffffffb3; }
+
+.won-account-list { display: grid; gap: 20px; }
+.won-account {
+  overflow: hidden;
+  border-radius: theme('borderRadius.card');
+  background: theme('colors.surface');
+}
+.won-account-main { display: flex; align-items: flex-start; gap: 16px; padding: 20px 18px 18px 20px; }
+.won-bank-mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 43px;
+  height: 43px;
+  margin-top: 3px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 800;
+  color: white;
+  background: theme('colors.brandDeep');
+}
+.won-bank-mark--woori { background: #a6d5f9; }
+.won-bank-mark--woori::after {
+  content: '';
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #cbf0ff;
+  background:
+    radial-gradient(ellipse 120% 85% at 49% 100%, #007bbd 50%, #f0fdff 54%, #81d3f8 64%, transparent 73%),
+    linear-gradient(140deg, theme('colors.brandCyan'), theme('colors.brandDeep') 58%);
+}
+.won-bank-mark--ibk { background: #205a95; font-style: italic; }
+.won-bank-mark--kakao { background: #ffe100; color: #191919; font-size: 22px; }
+.won-bank-mark--hana { background: #008477; }
+
+.won-account-content { flex: 1; min-width: 0; }
+.won-account-title { display: flex; min-height: 24px; align-items: start; justify-content: space-between; gap: 3px; }
+.won-account-title > a:first-child { min-width: 0; font-size: 16px; font-weight: 700; line-height: 1.35; word-break: keep-all; }
+.won-account-more { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; margin: -6px -5px -4px 0; border-radius: 50%; color: theme('colors.textWeak'); }
+.won-copy { display: inline-flex; min-height: 26px; align-items: center; gap: 5px; max-width: 100%; color: theme('colors.textWeak'); font-size: 13px; white-space: nowrap; }
+.won-account-detail { color: theme('colors.textBody'); font-size: 13px; margin-top: 4px; }
+.won-account-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 9px; flex-wrap: wrap; }
+.won-account-bottom strong { font-size: clamp(19px, 5.7vw, 24px); font-weight: 780; letter-spacing: -.035em; white-space: nowrap; }
+.won-account-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 41px;
+  padding: 6px 12px;
+  color: white;
+  background: #1372d2;
+  font-size: 13px;
+  font-weight: 650;
+}
+.won-account-notice > span { font-size: 20px; }
+.won-account-notice:focus-visible, .won-statement a:focus-visible { outline-color: white; }
+
+.won-section-heading, .won-section-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+}
+.won-section-heading { margin-bottom: 12px; }
+.won-section-heading > div { display: flex; flex-wrap: wrap; justify-content: end; gap: 6px; }
+.won-section-link { margin: 14px 0 6px; font-size: 17px; font-weight: 750; letter-spacing: -.03em; }
+.won-panel, .won-service-list { background: theme('colors.surface'); border-radius: theme('borderRadius.card'); }
+.won-panel { padding: 20px; }
+.won-account-info { display: grid; justify-items: start; gap: 10px; }
+.won-large-amount { font-size: clamp(25px, 7.4vw, 32px); font-weight: 780; line-height: 1.25; letter-spacing: -.04em; }
+.won-info-note { color: theme('colors.textBody'); background: theme('colors.bg'); border-radius: theme('borderRadius.button'); padding: 10px 12px; font-size: 14px; }
+.won-main-action {
+  display: grid;
+  place-items: center;
+  min-height: 46px;
+  width: 100%;
+  border-radius: theme('borderRadius.button');
+  background: theme('colors.primary');
+  color: white;
+  padding: 6px 12px;
+  font-weight: 700;
+}
+.won-main-action:focus-visible { outline-color: white !important; outline-offset: -4px !important; }
+.won-main-action:disabled { opacity: .65; }
+
+.won-service-list { padding: 6px 0; }
+.won-service-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 13px;
+  min-height: 62px;
+  padding: 9px 16px;
+  text-align: left;
+  border-radius: 8px;
+}
+.won-service-icon, .won-tile-art {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 43px;
+  height: 43px;
+  color: theme('colors.primary');
+  background: linear-gradient(145deg, #f5fcff, #c3e6ff);
+  border-radius: 12px;
+}
+.won-service-icon svg, .won-tile-art svg { filter: drop-shadow(1px 2px 0 #ffffff); }
+.won-row-copy { flex: 1; min-width: 0; }
+.won-row-copy strong, .won-row-copy small { display: block; word-break: keep-all; }
+.won-row-copy strong { font-size: 16px; font-weight: 680; }
+.won-row-copy small { margin-top: 2px; font-size: 13px; color: theme('colors.textWeak'); }
+.won-row-chevron { flex-shrink: 0; color: theme('colors.textWeak'); }
+.won-menu > h2 { margin: 24px 0 9px; }
+.won-notification-demo { display: grid; gap: 10px; margin-top: 20px; }
+.won-notification-demo > p { font-size: 14px; }
+.won-notification-demo [role='status']:empty { margin-top: -10px; }
+
+.won-top-tabs {
+  display: flex;
+  flex-shrink: 0;
+  align-items: stretch;
+  padding: 0 16px;
+}
+.won-top-tabs button {
+  position: relative;
+  min-height: 44px;
+  color: theme('colors.textWeak');
+  white-space: nowrap;
+}
+.won-top-tabs button[aria-pressed='true'] { color: theme('colors.textStrong'); font-weight: 750; }
+.won-top-tabs--line { justify-content: space-between; gap: 3px; border-bottom: 1px solid theme('colors.line'); background: theme('colors.surface'); }
+.won-top-tabs--line button { flex: 1; font-size: clamp(13px, 4vw, 17px); }
+.won-top-tabs--line button[aria-pressed='true']::after {
+  content: '';
+  position: absolute;
+  inset: auto 12% -1px;
+  height: 2px;
+  background: theme('colors.textStrong');
+  border-radius: 2px;
+}
+.won-top-tabs--line, .won-header:has(+ .won-top-tabs--line) { background: theme('colors.surface'); }
+.won-top-tabs--bold { gap: 19px; }
+.won-top-tabs--bold button { font-size: 20px; font-weight: 690; letter-spacing: -.045em; }
+.won-universal {
+  background: linear-gradient(180deg, theme('colors.surface') 0%, theme('colors.appSky') 56%);
+}
+
+.won-statement {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 298px;
+  overflow: hidden;
+  border-radius: theme('borderRadius.card');
+  background: linear-gradient(116deg, #1045e7 8%, #1972e8 63%, #2194ed 100%);
+  color: white;
+}
+.won-statement-heading {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+  padding: 15px 17px 0;
+}
+.won-statement-heading h2 { font-size: 15px; font-weight: 600; }
+.won-statement-heading .won-pill { min-height: 32px; border-color: #d5eeff9c; color: white; background: #0759c5; }
+.won-statement > p { font-size: clamp(29px, 8.7vw, 34px); font-weight: 770; margin: 21px 0 0; line-height: 1.2; letter-spacing: -.035em; }
+.won-statement-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 53px;
+  margin-top: auto;
+  background: #0e73d6;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  z-index: 1;
+}
+.won-statement-action span { display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: #e0f4ff; color: #0b62b9; font-size: 12px; }
+.won-card-art {
+  position: relative;
+  width: 90px;
+  height: 71px;
+  margin: auto 0 -7px;
+  transform: rotate(12deg) skew(-10deg);
+  border-radius: 14px;
+  background: linear-gradient(143deg, #63dfff, #23a8ec 52%, #1265bc);
+  box-shadow: 7px 3px 0 #144bad, inset 3px 3px 0 #a8edff;
+}
+.won-card-art > i, .won-card-art > b, .won-card-art > span { position: absolute; display: block; }
+.won-card-art > i { inset: 37px 36px 14px -7px; border-radius: 4px; border: 2px solid #e0f6ff; box-shadow: 0 7px 0 -1px #96daff, 0 14px 0 -1px #e0f6ff; }
+.won-card-art > b { width: 38px; height: 25px; right: -12px; top: 20px; border-radius: 4px; background: linear-gradient(145deg, #e3f3ff, #8dc9ff); }
+.won-card-art > span { display: grid; place-items: center; width: 49px; height: 34px; top: -10px; left: -9px; border-radius: 7px; color: #1c82e8; background: linear-gradient(145deg, #fff, #9ed7ff); }
+
+.won-universal .won-section-link { margin-top: 28px; }
+.won-rewards summary { display: flex; align-items: center; gap: 9px; min-height: 54px; cursor: pointer; list-style: none; }
+.won-rewards summary::-webkit-details-marker { display: none; }
+.won-rewards summary > span:nth-child(2) { flex: 1; min-width: 0; }
+.won-rewards summary strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+.won-rewards summary small { font-size: 12px; color: theme('colors.textWeak'); }
+.won-rewards summary b { color: theme('colors.primary'); border-radius: theme('borderRadius.chip'); padding: 3px 6px; margin-right: 2px; background: theme('colors.appSky'); }
+.won-mini-card { display: grid; place-items: center; flex-shrink: 0; width: 28px; height: 41px; border-radius: 3px; background: #fff1a4; color: theme('colors.brandDeep'); }
+.won-rewards details > p { border-top: 1px solid theme('colors.line'); margin-top: 10px; padding-top: 14px; color: theme('colors.primary'); font-size: 22px; font-weight: 750; }
+.won-category .won-service-list { margin: 12px -12px -12px; }
+
+.won-benefits { padding-top: 23px; }
+.won-recommended { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin-top: 22px; }
+.won-recommended a { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 3px 1px; border-radius: 8px; color: theme('colors.textBody'); text-align: center; font-size: 13px; line-height: 1.35; word-break: keep-all; }
+.won-tile-art { width: 42px; height: 42px; border-radius: 12px; }
+.won-recommended a:nth-child(2) .won-tile-art { background: #e7edf2; color: #405b71; }
+.won-recommended a:nth-child(4) .won-tile-art { background: #cfdcff; color: #2648b0; }
+.won-conveniences { margin-top: 38px; }
+.won-conveniences h2 { margin-bottom: 16px; }
+.won-conveniences .won-service-list { padding: 14px 0; }
+.won-conveniences .won-service-row { min-height: 83px; padding-inline: 20px; }
+.won-conveniences .won-row-chevron { display: none; }
+.won-conveniences .won-service-row:first-child .won-service-icon { color: #005fba; background: linear-gradient(145deg, #e6f5ff 54%, #f9c652 55%); }
+.won-conveniences .won-service-row:nth-child(3) .won-service-icon { color: #19854b; background: #e1f5ea; }
+
+.won-white-page { height: 100%; min-height: 0; display: flex; flex-direction: column; background: theme('colors.surface'); }
+.won-savings { font-size: 14px; }
+.won-savings section:first-child h2 { font-size: 14px; font-weight: 650; }
+.won-savings .won-large-amount { margin: 7px 0 9px; }
+.won-savings-trend { margin-top: 49px; }
+.won-savings h2:not(.won-muted) { font-size: 20px; }
+.won-savings em { color: theme('colors.primary'); font-style: normal; }
+.won-savings figure { margin: 20px 0 17px; }
+.won-savings svg { display: block; width: 100%; height: auto; overflow: visible; }
+.won-chart-grid { stroke: theme('colors.line'); stroke-width: 1; }
+.won-chart-area { fill: #e3f1ff; fill-opacity: .83; }
+.won-chart-line { fill: none; stroke: theme('colors.visualBlue'); stroke-width: 2; }
+.won-chart-dot { fill: theme('colors.visualBlue'); }
+.won-chart-guide { stroke: theme('colors.textBody'); stroke-width: 1; stroke-dasharray: 2 2; }
+.won-chart-tag { fill: white; stroke: theme('colors.line'); stroke-width: .7; }
+.won-chart-label { fill: theme('colors.textBody'); font-size: 9px; }
+.won-chart-months { display: flex; justify-content: space-around; margin-top: 5px; color: theme('colors.textWeak'); font-size: 11px; white-space: nowrap; }
+.won-chart-months span { flex: 1; text-align: center; }
+.won-savings-average { margin: 29px -16px 0; border-top: 8px solid #f4f6f8; padding: 27px 16px 12px; }
+
+.won-segment { display: flex; background: theme('colors.bg'); padding: 2px; border-radius: 8px; }
+.won-segment button { flex: 1; min-height: 34px; padding: 3px 11px; white-space: nowrap; font-size: 13px; font-weight: 650; color: theme('colors.textWeak'); border-radius: 7px; }
+.won-segment button[aria-pressed='true'] { color: theme('colors.textStrong'); background: theme('colors.surface'); box-shadow: 0 1px 3px #334a6525; }
+.won-spending { padding: 17px 16px 13px; }
+.won-spending-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 4px; font-size: 12px; font-weight: 620; }
+.won-month-picker { display: flex; align-items: center; gap: 2px; margin: 8px 0 2px -5px; }
+.won-month-picker button { display: grid; place-items: center; width: 35px; height: 42px; border-radius: 8px; }
+.won-month-picker button:disabled { opacity: .35; }
+.won-month-picker h2 { font-size: 16px; }
+.won-spending-previous { font-size: 13px; margin-top: 6px; font-weight: 600; }
+.won-calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 26px -3px 0; text-align: center; }
+.won-calendar > span:nth-child(-n+7) { padding: 8px 0; border-bottom: 1px solid theme('colors.line'); color: theme('colors.textWeak'); font-size: 13px; font-weight: 650; }
+.won-calendar > span.won-negative, .won-calendar-sunday { color: theme('colors.dangerText'); }
+.won-calendar button, .won-calendar-other { display: flex; align-items: center; flex-direction: column; padding: 6px 0 3px; gap: 3px; min-height: 49px; border-radius: 8px; }
+.won-calendar-other { color: theme('colors.textWeak'); opacity: .72; font-size: 15px; font-weight: 600; }
+.won-calendar button strong { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 12px; font-size: 16px; font-weight: 650; }
+.won-calendar button[aria-pressed='true'] strong { background: theme('colors.primary'); color: white; }
+.won-calendar button small { max-width: 100%; font-size: clamp(8px, 2.35vw, 10px); letter-spacing: -.045em; color: theme('colors.textWeak'); white-space: nowrap; }
+.won-day-expenses { margin-top: 12px; }
+.won-day-expenses h2 { margin-bottom: 6px; }
+.won-spending-summary { margin: 25px 0 8px; display: grid; gap: 10px; font-size: 14px; }
+.won-budget-row { display: grid; gap: 6px; }
+.won-budget-row > div, .won-amount-list > div { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
+.won-budget-row progress { width: 100%; height: 10px; accent-color: theme('colors.primary'); }
+.won-amount-list { width: 100%; font-size: 14px; }
+.won-amount-list > div { padding: 9px 0; border-bottom: 1px solid theme('colors.line'); }
+.won-amount-list dd { font-weight: 700; }
+
+@media (max-width: 350px) {
+  .won-header, .won-page, .won-home { padding-inline: 12px; }
+  .won-home-feature { margin-bottom: 33px; }
+  .won-alert-art { width: 45px; height: 45px; font-size: 29px; }
+  .won-account-main { gap: 10px; padding-inline: 15px; }
+  .won-account-title > a:first-child { font-size: 15px; }
+  .won-account-bottom { gap: 4px; }
+  .won-account-bottom .won-pill { padding-inline: 8px; }
+  .won-statement-heading { padding-inline: 12px; }
+  .won-spending { padding-inline: 11px; }
+}

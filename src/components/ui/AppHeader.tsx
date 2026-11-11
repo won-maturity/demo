@@ -11,7 +11,7 @@ export function AppHeader({
   right?: ReactNode;
 }) {
   return (
-    <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line bg-surface px-3">
+    <header className="flex h-14 shrink-0 items-center gap-2 bg-surface px-3">
       {onBack ? (
         <button
           type="button"
@@ -24,7 +24,7 @@ export function AppHeader({
       ) : (
         <span className="w-11" />
       )}
-      <h1 className="min-w-0 flex-1 truncate text-center text-[17px] font-bold text-textStrong">{title}</h1>
+      <h1 className="min-w-0 flex-1 truncate text-center text-lg font-bold text-textStrong">{title}</h1>
       <div className="flex w-11 items-center justify-end">{right}</div>
     </header>
   );

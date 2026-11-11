@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
 import { SecondaryButton } from '../../components/ui/Buttons';
@@ -20,7 +20,10 @@ export function LauncherPage() {
 
   return (
     <div className="h-full overflow-y-auto bg-bg px-5 py-5">
-      <p className="text-sm font-semibold text-primary">우리WON뱅킹</p>
+      <div className="flex min-h-tap items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-primary">우리WON뱅킹</p>
+        <Link to="/home" className="inline-flex min-h-tap items-center text-sm font-semibold text-primary">홈으로</Link>
+      </div>
       <h1 className="mt-1 text-[26px] font-bold leading-8 text-textStrong">WON하는 만기</h1>
       <p className="mt-2 text-sm leading-6 text-textBody">쓸 날짜와 목표에 맞춰 내 만기 자금이 한 번 더 일하게</p>
       <ul className="mt-4 grid grid-cols-2 gap-2">
@@ -58,8 +61,8 @@ export function LauncherPage() {
         ))}
       </div>
       <div className="mt-4 space-y-2 pb-4">
-        <SecondaryButton onClick={() => navigate('/simulator')}>수익성 시뮬레이터 보기</SecondaryButton>
-        <SecondaryButton onClick={() => navigate('/navi/no-response')}>무응답이면 어떻게 되나요</SecondaryButton>
+        <SecondaryButton onClick={() => navigate('/simulator', { state: { fromDemo: true } })}>수익성 시뮬레이터 보기</SecondaryButton>
+        <SecondaryButton onClick={() => navigate('/navi/no-response', { state: { fromDemo: true } })}>무응답이면 어떻게 되나요</SecondaryButton>
         <button
           type="button"
           aria-pressed={engineOn}

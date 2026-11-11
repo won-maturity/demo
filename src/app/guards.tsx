@@ -4,7 +4,7 @@ import { useDemoStore } from '../store/useDemoStore';
 
 export function RequirePersona() {
   const personaId = useDemoStore((state) => state.personaId);
-  if (!personaId) return <Navigate to="/" replace />;
+  if (!personaId) return <Navigate to="/demo" replace />;
   return <Outlet />;
 }
 

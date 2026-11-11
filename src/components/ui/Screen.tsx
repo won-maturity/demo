@@ -25,9 +25,9 @@ export function Screen({
           <ProgressSteps current={step} />
         </div>
       ) : null}
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">{children}</div>
       {footer ? (
-        <div className="shrink-0 space-y-2 border-t border-line bg-surface px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+        <div className="shrink-0 space-y-2 border-t border-line bg-surface px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
           {footer}
         </div>
       ) : null}
