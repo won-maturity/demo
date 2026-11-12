@@ -10,6 +10,18 @@ describe('mockInterpret', () => {
     expect(result.items[1]).toMatchObject({ purpose: 'MOVING', amount: 15_000_000, certainty: 'NEEDS_CONFIRM', timeText: '내년 봄쯤' });
   });
 
+  it('asks for a day when only a month is given instead of inventing the twentieth', () => {
+    const result = mockInterpret('3천만 원 중 반은 내년 5월 아이 학비, 나머지는 이사 가서 내년 봄쯤 쓸 것 같아요', DEMO_TODAY);
+    expect(result.items[0]).toMatchObject({ certainty: 'NEEDS_CONFIRM', dateRange: { from: '2027-05-01', to: '2027-05-31' } });
+    expect(result.items[0]?.date).toBeUndefined();
+  });
+
+  it('preserves an explicit use day and rejects an impossible calendar date', () => {
+    expect(mockInterpret('내년 5월 28일 학비', DEMO_TODAY).items[0]?.date).toBe('2027-05-28');
+    expect(mockInterpret('내년 2월 30일 학비', DEMO_TODAY).items[0]?.certainty).toBe('NEEDS_CONFIRM');
+    expect(mockInterpret('내년 2월 30일 학비', DEMO_TODAY).items[0]?.date).toBeUndefined();
+  });
+
   it('keeps a vague moving plan unconfirmed', () => {
     const result = mockInterpret(EXAMPLE_UTTERANCES[1], DEMO_TODAY);
     expect(result.items).toHaveLength(1);

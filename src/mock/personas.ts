@@ -1,4 +1,4 @@
-export type PersonaId = 'A' | 'B' | 'C' | 'D';
+export type PersonaId = 'A' | 'B' | 'C' | 'D' | 'E';
 
 export type RiskProfile = '안정형' | '안정추구형' | '적극투자형' | '미진단';
 
@@ -15,12 +15,32 @@ export type Persona = {
   annualRate: number;
   autoRedeposit: boolean;
   outcome: string;
+  scenario?: { title: string; utterance: string; confirmationHint: string };
 };
 
 export const DEMO_TODAY = '2026-10-22';
 export const DEFAULT_PERSONA_ID = 'D';
 
 export const PERSONAS: Persona[] = [
+  {
+    id: 'E',
+    name: '정하늘',
+    age: 42,
+    riskProfile: '안정형',
+    investmentPreference: 'declines',
+    diagnosedAt: '2026-08-12',
+    productName: '정기예금',
+    principal: 30_000_000,
+    maturityDate: '2026-11-21',
+    annualRate: 0.031,
+    autoRedeposit: true,
+    outcome: '자녀 학비와 이사비를 준비하는 부모예요. 원금 3천만 원을 1,500만 원씩 나눠 쓰는 날에 맞춰요.',
+    scenario: {
+      title: '학비·이사 자금 나누기',
+      utterance: '3천만 원 중 반은 내년 5월 20일 아이 학비, 나머지는 이사 가서 내년 봄쯤 쓸 것 같아요',
+      confirmationHint: '학비 2027.05.20 · 이사 “봄쯤”은 3월 말인지 확인한 뒤, “이대로 맞아요”를 눌러요.',
+    },
+  },
   {
     id: DEFAULT_PERSONA_ID,
     name: '양대건',

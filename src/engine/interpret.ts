@@ -23,7 +23,7 @@ export type InterpretResult = {
 };
 
 export const EXAMPLE_UTTERANCES = [
-  '3천만 원 중에 반은 내년 5월 아이 학비고, 나머지는 이사 가서 내년 봄쯤 쓸 것 같아요',
+  '3천만 원 중에 반은 내년 5월 20일 아이 학비고, 나머지는 이사 가서 내년 봄쯤 쓸 것 같아요',
   '이사 가서 내년 봄쯤 쓸 것 같아요',
   '딱히 정한 건 없고 몇 년 묵혀 둘 돈이에요',
 ] as const;
@@ -95,10 +95,18 @@ function detectTime(text: string, today: string): Pick<IntentItem, 'timeText' | 
   if (month) {
     const m = Number(month[1]);
     const mm = String(m).padStart(2, '0');
+    const dayMatch = text.match(/월\s*(\d{1,2})\s*일/);
+    const day = dayMatch ? Number(dayMatch[1]) : undefined;
+    const lastDay = new Date(Date.UTC(year, m, 0)).getUTCDate();
+    if (m < 1 || m > 12 || (day !== undefined && (day < 1 || day > lastDay))) {
+      return { timeText: '날짜 확인 필요', certainty: 'NEEDS_CONFIRM' };
+    }
     return {
-      timeText: /내년/.test(text) ? `내년 ${m}월` : `${m}월`,
-      date: `${year}-${mm}-20`,
-      certainty: 'CONFIRMED',
+      timeText: day ? `${year}년 ${m}월 ${day}일` : /내년/.test(text) ? `내년 ${m}월` : `${m}월`,
+      ...(day
+        ? { date: `${year}-${mm}-${String(day).padStart(2, '0')}` }
+        : { dateRange: { from: `${year}-${mm}-01`, to: `${year}-${mm}-${lastDay}` } }),
+      certainty: day ? 'CONFIRMED' : 'NEEDS_CONFIRM',
     };
   }
   return { timeText: '시기 미정', certainty: 'NEEDS_CONFIRM' };

@@ -10,6 +10,12 @@ export type PortfolioReport = {
 // Previously produced reports supplied by a mock external portfolio service.
 // The chat and rule engine retrieve these records without performing a new diagnosis.
 export const PORTFOLIO_REPORTS: Record<PersonaId, PortfolioReport> = {
+  E: {
+    analyzedAt: '2026-10-15',
+    source: 'WON 포트폴리오 · 모의 외부 분석',
+    allocations: [{ label: '예금·현금', percent: 100 }],
+    summary: '학비와 이사 자금을 예금·현금으로 보유하고 있어요. 예정 지출일별로 나눠 관리하도록 기록된 분석 결과예요.',
+  },
   A: {
     analyzedAt: '2026-10-15',
     source: 'WON 포트폴리오 · 모의 외부 분석',

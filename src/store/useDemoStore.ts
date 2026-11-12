@@ -369,6 +369,9 @@ export const useDemoStore = create<DemoState>((set, get) => ({
       splitLegs: null,
       chatStep: 'interpret',
     });
+    if (checked.result.items.some((item) => item.certainty === 'NEEDS_CONFIRM' && /봄/.test(item.timeText))) {
+      get().appendMessage('ai', '말씀하신 용도별로 금액을 나눠 봤어요. 이사 자금을 쓸 “내년 봄쯤”은 3월 말로 보면 될까요? 날짜를 고른 뒤 내용이 맞는지 확인해 주세요.');
+    }
   },
   answerIntentDate: (index, date) => {
     const current = get().interpret;

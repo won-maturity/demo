@@ -50,6 +50,7 @@ export function LauncherPage() {
             >
               <div className="flex items-center gap-2">
                 <Badge tone="neutral">페르소나 {persona.id}</Badge>
+                {persona.scenario ? <Badge tone="ai">목적 분리 시연</Badge> : null}
                 {persona.id === 'D' ? <Badge tone="ai">추천 시연</Badge> : null}
                 <span className="text-[15px] font-bold text-textStrong">
                   {persona.name} · {persona.age}세
@@ -57,8 +58,16 @@ export function LauncherPage() {
               </div>
               <p className="mt-1 text-[13px] text-textBody">{persona.riskProfile}{persona.investmentPreference === 'declines' ? ' · 투자 의사 없음' : ''} · 정기예금</p>
               <p className="mt-2 text-sm leading-6 text-textStrong">{persona.outcome}</p>
+              {persona.scenario && <p className="mt-2 text-xs leading-5 text-textBody">{persona.scenario.confirmationHint}</p>}
               <span className="mt-3 inline-flex min-h-tap items-center text-sm font-bold text-primary">이 고객으로 시작</span>
             </button>
+            {persona.scenario && <div className="border-t border-line p-4">
+              <p className="mb-2 text-sm leading-6 text-textBody">“{persona.scenario.utterance}”</p>
+              <SecondaryButton onClick={() => {
+                selectPersona(persona.id);
+                navigate('/navi/chat', { state: { fromMaturity: true, draft: persona.scenario!.utterance } });
+              }}>이 시나리오로 상담 시작</SecondaryButton>
+            </div>}
           </Card>
         ))}
       </div>

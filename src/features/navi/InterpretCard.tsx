@@ -55,6 +55,9 @@ export function InterpretCard({
                 ))}
               </div>
             ) : null}
+            {item.certainty === 'NEEDS_CONFIRM' && !/봄/.test(item.timeText) && item.timeText !== '몇 년' && pickingIndex !== index
+              ? <div className="mt-2"><Chip label="사용 날짜 확인하기" onClick={() => onAskCustomDate(index)} /></div>
+              : null}
             {pickingIndex === index ? (
               <div className="mt-2 flex flex-wrap gap-2">
                 {DATE_CHIPS.filter((chip) => chip.id !== 'unknown').map((chip) => (
