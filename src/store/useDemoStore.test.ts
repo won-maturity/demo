@@ -21,7 +21,7 @@ describe('bank lookup conversation', () => {
     const request = store.startMaturityChat();
     await vi.runAllTimersAsync();
     await request;
-    expect(useDemoStore.getState().maturityLookup).toMatchObject({ status: 'success', data: { customerName: '정하늘', principal: 30_000_000 } });
+    expect(useDemoStore.getState().maturityLookup).toMatchObject({ status: 'success', data: { customerName: '양대건', principal: 30_000_000 } });
     store.submitUtterance(persona.scenario!.utterance);
     let state = useDemoStore.getState();
     expect(state.interpret?.items).toMatchObject([
@@ -61,7 +61,7 @@ describe('bank lookup conversation', () => {
     state = useDemoStore.getState();
     expect(state.maturityLookup).toMatchObject({
       status: 'success',
-      data: { customerName: '양대건', principal: 30_000_000, estimatedInterest: 930_000, annualRate: 0.031,
+      data: { customerName: '정하늘', principal: 30_000_000, estimatedInterest: 930_000, annualRate: 0.031,
         maturityDate: '2026-11-21', daysToMaturity: 30, autoRedeposit: true, source: 'demo-bank-service' },
     });
     expect(state.messages.at(-1)?.text).toContain('이 돈은 언제 쓰실 예정이세요?');
@@ -110,7 +110,7 @@ describe('bank lookup conversation', () => {
     await vi.runAllTimersAsync();
     await Promise.all([oldRequest, newRequest]);
     expect(useDemoStore.getState().maturityLookup).toMatchObject({ status: 'success', data: { customerName: '소원', principal: 50_000_000 } });
-    expect(useDemoStore.getState().messages.some((message) => message.text.includes('양대건'))).toBe(false);
+    expect(useDemoStore.getState().messages.some((message) => message.text.includes('정하늘'))).toBe(false);
   });
 
   it('refreshes a setting changed during a lookup before acknowledging the result', async () => {

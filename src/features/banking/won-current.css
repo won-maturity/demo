@@ -101,10 +101,8 @@
 .won-current-home .won-account-detail { width: fit-content; border-radius: 999px; background: #eef1f3; padding: 2px 7px; margin: 3px 0; }
 .won-home-all { display: grid; place-items: center; min-height: 45px; margin-top: 12px; border-radius: 10px; border: 1px solid #dce0e5; background: white; font-size: 16px; font-weight: 770; }
 .won-home-more { background: white; }
-.won-maturity-entry { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 17px; padding: 11px 16px; border-radius: 13px; background: #e6f1fe; text-align: left; }
-.won-maturity-entry small, .won-maturity-entry strong { display: block; }
-.won-maturity-entry small { font-size: 12px; color: #4a6078; }
-.won-maturity-entry strong { font-size: 16px; color: #0967cf; }
+.won-maturity-entry { margin-bottom: 12px; }
+.won-maturity-entry .won-carousel-slide { width: 100%; text-align: left; }
 .won-home-recommend { margin-right: -16px; padding-right: 16px; }
 .won-home-recommend > div { width: 81%; border-radius: 16px; padding: 9px 0; background: #f6edfa; }
 .won-home-recommend > div:nth-child(2) { background: #e4edfd; }

@@ -24,7 +24,7 @@ export const DEFAULT_PERSONA_ID = 'D';
 export const PERSONAS: Persona[] = [
   {
     id: 'E',
-    name: '정하늘',
+    name: '양대건',
     age: 42,
     riskProfile: '안정형',
     investmentPreference: 'declines',
@@ -43,7 +43,7 @@ export const PERSONAS: Persona[] = [
   },
   {
     id: DEFAULT_PERSONA_ID,
-    name: '양대건',
+    name: '정하늘',
     age: 39,
     riskProfile: '안정형',
     investmentPreference: 'declines',

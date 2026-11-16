@@ -84,9 +84,12 @@ export function HomePage() {
         <Link className="won-home-all" to="/assets/accounts">전체계좌보기</Link>
       </section>
       <section className="won-current-section won-home-more">
-        <button type="button" className="won-maturity-entry" onClick={openMaturity}>
-          <span><small>{name}님 · 만기까지 {days}일</small><strong>WON하는 만기</strong></span><ChevronRight size={21} aria-hidden />
-        </button>
+        <div className="won-carousel won-tone--sky won-maturity-entry">
+          <button type="button" className="won-carousel-slide" onClick={openMaturity}>
+            <span><strong>WON하는 만기</strong><small>{name}님 · 만기까지 {days}일</small></span>
+            <WonArt kind="house" />
+          </button>
+        </div>
         <WonCarousel slides={homeSlides} start={4} label="홈 추천 상품" />
         <h2>추천서비스</h2>
         <div className="won-horizontal won-home-recommend">

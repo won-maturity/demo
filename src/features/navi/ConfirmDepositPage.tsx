@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AmountText, ExampleValue } from '../../components/ui/AmountText';
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
@@ -14,6 +14,7 @@ import { useDemoStore } from '../../store/useDemoStore';
 
 export function ConfirmDepositPage() {
   const navigate = useNavigate();
+  const fromSummary = (useLocation().state as { fromSummary?: boolean } | null)?.fromSummary === true;
   const personaId = useDemoStore((state) => state.personaId);
   const selectedProductId = useDemoStore((state) => state.selectedProductId);
   const answers = useDemoStore((state) => state.answers);
@@ -73,8 +74,8 @@ export function ConfirmDepositPage() {
 
   return (
     <Screen
-      title="예금 승인"
-      onBack={() => navigate('/navi/options')}
+      title={fromSummary ? '자동 재예치 승인' : '예금 승인'}
+      onBack={() => navigate(fromSummary ? '/navi/summary' : '/navi/options')}
       footer={<PrimaryButton onClick={approve}>인증 완료(데모)</PrimaryButton>}
     >
       <ChatBubble role="ai">
