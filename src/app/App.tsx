@@ -93,7 +93,7 @@ export function App() {
       <PhoneFrame>
         <Routes>
           <Route element={<Shell />}>
-            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/" element={<Navigate to="/demo/phone" replace />} />
             <Route element={<BankingShell />}>
               <Route path="/home" element={<HomePage />} />
               <Route path="/assets" element={<CurrentAssetsPage />} />
@@ -147,7 +147,7 @@ export function App() {
                 <Route path="/navi/invest/final" element={<FinalPage />} />
               </Route>
             </Route>
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
           </Route>
         </Routes>
       </PhoneFrame>

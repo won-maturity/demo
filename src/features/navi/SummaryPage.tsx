@@ -4,17 +4,27 @@ import { useNavigate } from 'react-router-dom';
 import { AmountText } from '../../components/ui/AmountText';
 import { ExampleValue } from '../../components/ui/AmountText';
 import { Card } from '../../components/ui/Card';
-import { PrimaryButton, SecondaryButton } from '../../components/ui/Buttons';
 import { Screen } from '../../components/ui/Screen';
 import { formatDotDate } from '../../lib/format';
 import { daysUntil, exampleInterest, getPersona } from '../../mock/personas';
+import { REDEPOSIT_ID } from '../../mock/products';
 import { useDemoStore } from '../../store/useDemoStore';
+
+const POST_MATURITY_RATES = [
+  { period: '1개월 이내', ratio: 0.5 },
+  { period: '1개월 초과 ~ 6개월', ratio: 0.3 },
+  { period: '6개월 초과', ratio: 0.2 },
+];
+
+const choiceButton =
+  'min-h-tap rounded-button border px-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
 
 export function SummaryPage() {
   const navigate = useNavigate();
   const personaId = useDemoStore((state) => state.personaId);
   const autoRedeposit = useDemoStore((state) => state.autoRedeposit);
-  const setAutoRedeposit = useDemoStore((state) => state.setAutoRedeposit);
+  const selectProduct = useDemoStore((state) => state.selectProduct);
+  const addConsent = useDemoStore((state) => state.addConsent);
   const [open, setOpen] = useState(false);
   if (!personaId) return null;
   const persona = getPersona(personaId);
@@ -26,8 +36,13 @@ export function SummaryPage() {
       onBack={() => navigate('/home')}
       footer={
         <>
-          <PrimaryButton onClick={() => navigate('/navi/chat', { state: { fromMaturity: true } })}>용도부터 이야기해요</PrimaryButton>
-          <SecondaryButton onClick={() => navigate('/navi/no-response', { state: { fromSummary: true } })}>아무것도 안 하면?</SecondaryButton>
+          <button
+            type="button"
+            onClick={() => navigate('/home')}
+            className="inline-flex min-h-tap w-full items-center justify-center rounded-button px-4 text-[15px] font-semibold text-textWeak transition active:bg-bg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            이번에는 괜찮아요
+          </button>
         </>
       }
     >
@@ -55,22 +70,28 @@ export function SummaryPage() {
         </div>
       </Card>
       <Card className="mt-3">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-[15px] font-bold text-textStrong">사전 동의된 자동 재예치</p>
-            <p className="mt-1 text-[13px] leading-5 text-textBody">켜져 있으면 만기일에 같은 조건으로 다시 맡겨요.</p>
-          </div>
+        <p className="text-[15px] font-bold text-textStrong">사전 동의된 자동 재예치</p>
+        <p className="mt-1 text-[13px] leading-5 text-textBody">자동 재예치를 고르면 만기일에 같은 조건으로 다시 맡겨요.</p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <button
             type="button"
-            aria-pressed={autoRedeposit}
-            aria-label="자동 재예치"
-            onClick={() => setAutoRedeposit(!autoRedeposit)}
-            className={`relative h-8 w-14 shrink-0 rounded-chip ${autoRedeposit ? 'bg-primary' : 'bg-line'}`}
+            onClick={() => {
+              selectProduct(REDEPOSIT_ID);
+              addConsent('만기 요약에서 자동 재예치를 골랐어요.');
+              navigate('/navi/confirm-deposit', { state: { fromSummary: true } });
+            }}
+            className={`${choiceButton} border-primary bg-primary text-white active:bg-primaryPressed`}
           >
-            <span className={`absolute top-1 h-6 w-6 rounded-full bg-surface ${autoRedeposit ? 'left-7' : 'left-1'}`} />
+            자동 재예치
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/navi/chat', { state: { fromMaturity: true } })}
+            className={`${choiceButton} border-line bg-surface text-textStrong active:bg-bg`}
+          >
+            다른 상품도 궁금해요
           </button>
         </div>
-        <p className="mt-2 text-sm font-semibold text-primary">{autoRedeposit ? 'ON' : 'OFF'}</p>
       </Card>
       <button
         type="button"
@@ -82,11 +103,29 @@ export function SummaryPage() {
         <ChevronDown size={18} className={`text-textWeak ${open ? 'rotate-180' : ''}`} aria-hidden />
       </button>
       {open ? (
-        <p className="mt-2 rounded-card bg-surface px-4 py-3 text-sm leading-6 text-textBody shadow-card">
-          {autoRedeposit
-            ? '만기일에 같은 조건으로 자동 재예치돼요.'
-            : '자동 재예치가 꺼져 있어요. 만기 금액은 연결 계좌로 들어와요.'}
-        </p>
+        <div className="mt-2 rounded-card bg-surface px-4 py-3 text-sm leading-6 text-textBody shadow-card">
+          <p>
+            만기일이 지나도 찾지 않고 두시면 만기 후 이율이 적용돼 이자가 줄어요. 지금 금리
+            {` 연 ${(persona.annualRate * 100).toFixed(2)}%`}를 기준으로 하면 이렇게 돼요.
+          </p>
+          <ul className="mt-2 divide-y divide-line">
+            {POST_MATURITY_RATES.map((tier) => (
+              <li key={tier.period} className="flex items-center justify-between py-2">
+                <span className="text-textStrong">{tier.period}</span>
+                <span>
+                  약정 금리의 <strong className="text-textStrong">{tier.ratio * 100}%</strong>
+                  {` · 연 ${(persona.annualRate * tier.ratio * 100).toFixed(2)}%`}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-[13px] text-textWeak">
+            {autoRedeposit
+              ? '자동 재예치가 켜져 있으면 만기일에 같은 조건으로 다시 맡겨요. 이자 손해가 없어요.'
+              : '자동 재예치가 꺼져 있어요. 만기일 이후 찾지 않으면 위 이율이 적용돼요.'}
+          </p>
+          <p className="mt-1 text-[12px] text-textWeak">시연용 예시 계산이에요.</p>
+        </div>
       ) : null}
     </Screen>
   );
