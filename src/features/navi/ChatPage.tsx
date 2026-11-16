@@ -10,6 +10,7 @@ import { EXAMPLE_UTTERANCES } from '../../engine/interpret';
 import { needsHandoff } from '../../engine/rules';
 import { BankLookupCard } from './BankLookupCard';
 import { InterpretCard } from './InterpretCard';
+import { PlanCard } from './PlanCard';
 import { useChatReply } from './useChatReply';
 import {
   DATE_CHIPS,
@@ -27,7 +28,9 @@ import { useDemoStore } from '../../store/useDemoStore';
 export function ChatPage() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const backTo = ['/home', '/banking', '/menu'].includes(state?.fromBanking) ? state.fromBanking : '/navi/summary';
+  const revising = useDemoStore((state) => state.revising);
+  const plan = useDemoStore((state) => state.plan);
+  const backTo = revising ? '/navi/plan' : ['/home', '/banking', '/menu'].includes(state?.fromBanking) ? state.fromBanking : '/navi/summary';
   const bottomRef = useRef<HTMLDivElement>(null);
   const feedRef = useRef<HTMLElement>(null);
   const followReply = useRef(true);
@@ -41,6 +44,8 @@ export function ChatPage() {
   const setAnswers = useDemoStore((state) => state.setAnswers);
   const setHandoff = useDemoStore((state) => state.setHandoff);
   const submitUtterance = useDemoStore((state) => state.submitUtterance);
+  const submitRevision = useDemoStore((state) => state.submitRevision);
+  const confirmRevision = useDemoStore((state) => state.confirmRevision);
   const answerIntentDate = useDemoStore((state) => state.answerIntentDate);
   const answerIntentTiming = useDemoStore((state) => state.answerIntentTiming);
   const confirmIntent = useDemoStore((state) => state.confirmIntent);
@@ -52,9 +57,10 @@ export function ChatPage() {
   const [draft, setDraft] = useState(() => {
     if (typeof state?.draft === 'string') return state.draft;
     // 시나리오가 있는 고객은 아직 말하지 않았으면 시나리오 발화를 입력창에 미리 채워요.
-    const { personaId: id, messages: current } = useDemoStore.getState();
+    const { personaId: id, messages: current, revising: editingPlan } = useDemoStore.getState();
     if (!id || current.some((message) => message.role === 'user')) return '';
-    return getPersona(id).scenario?.utterance ?? '';
+    const scenario = getPersona(id).scenario;
+    return (editingPlan ? scenario?.revisionUtterance : scenario?.utterance) ?? '';
   });
   const [pickingIndex, setPickingIndex] = useState<number | null>(null);
 
@@ -138,15 +144,21 @@ export function ChatPage() {
     if (!text || isReplying || (maturityEntry && maturityLookup.status !== 'success') || investmentLookup.status === 'error') return;
     setDraft('');
     setPickingIndex(null);
-    reply(() => submitUtterance(text));
+    reply(() => (revising ? submitRevision(text) : submitUtterance(text)));
   };
 
-  const acceptIntent = () => reply(() => {
+  const acceptIntent = () => revising ? acceptRevision() : reply(() => {
     const ok = confirmIntent();
     if (!ok) return;
     setPickingIndex(null);
     return finish();
   });
+
+  const acceptRevision = () => {
+    if (!confirmRevision()) return;
+    setPickingIndex(null);
+    navigate('/navi/confirm-deposit', { state: { revising: true } });
+  };
 
   const querying = maturityLookup.status === 'loading' || investmentLookup.status === 'loading';
   const blocked = isReplying || (maturityEntry && maturityLookup.status !== 'success') || investmentLookup.status === 'error';
@@ -169,7 +181,8 @@ export function ChatPage() {
         <button type="button" onClick={() => {
           cancelReply();
           followReply.current = true;
-          useDemoStore.getState().selectPersona(personaId);
+          if (revising) useDemoStore.getState().startPlanRevision();
+          else useDemoStore.getState().selectPersona(personaId);
           setPickingIndex(null);
           setDraft('');
           setExamples(false);
@@ -188,7 +201,9 @@ export function ChatPage() {
           <p>{messages[1]?.text ?? '만기 자금을 어떻게 쓰실 계획인가요?'}</p>
         </section>}
         <div className="won-chat-messages" aria-live="polite" aria-busy={isReplying}>
-          {messages.slice(2).map((message) => message.kind ? (
+          {messages.slice(2).map((message) => message.kind === 'plan' ? (
+            plan ? <PlanCard key={message.id} plan={plan} /> : null
+          ) : message.kind ? (
             <BankLookupCard key={message.id} type={message.kind === 'maturity-lookup' ? 'maturity' : 'investment'}
               onRetry={() => reply(message.kind === 'maturity-lookup'
                 ? useDemoStore.getState().startMaturityChat
@@ -200,6 +215,7 @@ export function ChatPage() {
             <fieldset disabled={blocked} className="min-w-0">
               <InterpretCard
                 items={interpret.items}
+                previous={revising ? plan?.legs : undefined}
                 notes={validationNotes}
                 pickingIndex={pickingIndex}
                 onPickDate={(index, date) => {
@@ -243,7 +259,7 @@ export function ChatPage() {
           <PrimaryButton disabled={blocked} onClick={() => navigate('/navi/handoff')}>전문가에게 연결</PrimaryButton>
         ) : chatStep === 'interpret' ? (
           <div className="space-y-2">
-            <PrimaryButton disabled={blocked || needsConfirm} onClick={acceptIntent}>이대로 맞아요</PrimaryButton>
+            <PrimaryButton disabled={blocked || needsConfirm} onClick={acceptIntent}>{revising ? '이대로 바꿀게요' : '이대로 맞아요'}</PrimaryButton>
             <SecondaryButton disabled={blocked} onClick={() => {
               const previous = useDemoStore.getState().utterance ?? '';
               reply(() => {

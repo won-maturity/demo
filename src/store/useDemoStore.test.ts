@@ -212,3 +212,53 @@ describe('bank lookup conversation', () => {
     expect(useDemoStore.getState().chatStep).toBe('timing');
   });
 });
+
+describe('plan revision after approval', () => {
+  it('lets the customer come back, change a date with the AI and re-approve the plan', () => {
+    const store = useDemoStore.getState();
+    store.selectPersona('E');
+    store.submitUtterance(getPersona('E').scenario!.utterance);
+    store.answerIntentDate(1, '2027-03-31');
+    expect(store.confirmIntent()).toBe(true);
+    store.complete('split');
+    expect(useDemoStore.getState().plan?.legs.map((leg) => leg.date)).toEqual(['2027-05-20', '2027-03-31']);
+
+    // 같은 고객으로 다시 들어와도 예약된 계획은 남아 있어요.
+    store.selectPersona('E');
+    expect(useDemoStore.getState().plan).not.toBeNull();
+
+    store.startPlanRevision();
+    let state = useDemoStore.getState();
+    expect(state.revising).toBe(true);
+    expect(state.chatStep).toBe('revise');
+    expect(state.messages.some((message) => message.kind === 'plan')).toBe(true);
+
+    store.submitRevision('뭔가 바뀐 것 같아요');
+    expect(useDemoStore.getState().chatStep).toBe('revise');
+    expect(useDemoStore.getState().messages.at(-1)?.text).toContain('바뀐 내용을 찾지 못했어요');
+
+    store.submitRevision(getPersona('E').scenario!.revisionUtterance!);
+    state = useDemoStore.getState();
+    expect(state.chatStep).toBe('interpret');
+    expect(state.interpret?.items[1]).toMatchObject({ purpose: 'MOVING', date: '2027-06-30', certainty: 'CONFIRMED' });
+
+    expect(store.confirmRevision()).toBe(true);
+    store.approveRevision();
+    state = useDemoStore.getState();
+    expect(state.revising).toBe(false);
+    expect(state.plan?.legs.map((leg) => leg.date)).toEqual(['2027-05-20', '2027-06-30']);
+    expect(state.planHistory).toEqual([{ at: '2026-10-22 09:41', lines: ['이사 날짜 2027-03-31 → 2027-06-30'] }]);
+    expect(state.completion?.via).toBe('split');
+  });
+
+  it('drops the saved plan when another customer is selected', () => {
+    const store = useDemoStore.getState();
+    store.selectPersona('E');
+    store.submitUtterance(getPersona('E').scenario!.utterance);
+    store.answerIntentDate(1, '2027-03-31');
+    store.confirmIntent();
+    store.complete('split');
+    store.selectPersona('D');
+    expect(useDemoStore.getState().plan).toBeNull();
+  });
+});

@@ -46,7 +46,7 @@ export function toPurposeId(purpose: Purpose): PurposeId | undefined {
   return undefined;
 }
 
-function parseMoney(text: string): number | undefined {
+export function parseMoney(text: string): number | undefined {
   const cheon = text.match(/(\d+)\s*천만\s*원/);
   if (cheon) return Number(cheon[1]) * 10_000_000;
   const baek = text.match(/(\d+)\s*백만\s*원/);
@@ -56,7 +56,7 @@ function parseMoney(text: string): number | undefined {
   return undefined;
 }
 
-function detectPurpose(text: string): Purpose | null {
+export function detectPurpose(text: string): Purpose | null {
   if (/학비|등록금/.test(text)) return 'TUITION';
   if (/이사|전세|보증금/.test(text)) return 'MOVING';
   if (/청약|내 집/.test(text)) return 'HOUSING';
@@ -65,7 +65,7 @@ function detectPurpose(text: string): Purpose | null {
   return null;
 }
 
-function detectTime(text: string, today: string): Pick<IntentItem, 'timeText' | 'dateRange' | 'date' | 'certainty'> {
+export function detectTime(text: string, today: string): Pick<IntentItem, 'timeText' | 'dateRange' | 'date' | 'certainty'> {
   const year = Number(today.slice(0, 4)) + (/내년/.test(text) ? 1 : 0);
   if (/봄쯤/.test(text)) {
     return {

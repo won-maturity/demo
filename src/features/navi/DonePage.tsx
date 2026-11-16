@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
-import { SecondaryButton } from '../../components/ui/Buttons';
+import { PrimaryButton, SecondaryButton } from '../../components/ui/Buttons';
 import { Screen } from '../../components/ui/Screen';
 import { HORIZON_LABEL, RULE_COPY, estimateHorizon, getEligibleOptions } from '../../engine/rules';
 import { PURPOSE_LABEL } from '../../mock/chatScripts';
@@ -19,6 +19,7 @@ export function DonePage() {
   const interpret = useDemoStore((state) => state.interpret);
   const confirmedAt = useDemoStore((state) => state.confirmedAt);
   const splitLegs = useDemoStore((state) => state.splitLegs);
+  const planHistory = useDemoStore((state) => state.planHistory);
   if (!personaId || !completion) return null;
   const persona = getPersona(personaId);
   const product = getProduct(completion.productId);
@@ -29,8 +30,10 @@ export function DonePage() {
   });
   const chosen = result.options.find((option) => option.productId === product.id);
 
-  const headline =
-    completion.via === 'no-response'
+  const revised = planHistory.length > 0 && completion.via === 'split';
+  const headline = revised
+    ? '만기 계획을 바꿨어요. 만기일에 바뀐 계획대로 실행돼요.'
+    : completion.via === 'no-response'
       ? '응답이 없어 재예치로 진행했어요.'
       : completion.via === 'invest'
         ? '투자 상품 선택 시연을 마쳤어요.'
@@ -83,6 +86,10 @@ export function DonePage() {
       title: '적용된 규칙',
       detail: result.appliedRules.map((rule) => `${rule} · ${RULE_COPY[rule]}`).join(' '),
     },
+    ...planHistory.map((change, index) => ({
+      title: `계획 변경 ${index + 1}`,
+      detail: `${change.at} · ${change.lines.join(' / ')}`,
+    })),
     {
       title: '동의한 내용',
       detail: consents.length ? consents.join(' ') : '저장된 동의 문장이 없어요.',
@@ -102,7 +109,14 @@ export function DonePage() {
     <Screen
       title="완료와 기록"
       onBack={() => navigate('/home')}
-      footer={<SecondaryButton onClick={() => navigate('/demo')}>다른 고객 시연</SecondaryButton>}
+      footer={
+        <>
+          {completion.via === 'split' && (
+            <PrimaryButton onClick={() => navigate('/home')}>홈으로</PrimaryButton>
+          )}
+          <SecondaryButton onClick={() => navigate('/demo')}>다른 고객 시연</SecondaryButton>
+        </>
+      }
     >
       <h2 className="text-xl font-bold leading-7 text-textStrong">{headline}</h2>
       <p className="mt-2 text-sm leading-6 text-textBody">
