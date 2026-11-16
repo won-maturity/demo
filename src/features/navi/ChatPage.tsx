@@ -32,6 +32,7 @@ export function ChatPage() {
   const feedRef = useRef<HTMLElement>(null);
   const followReply = useRef(true);
   const inputRef = useRef<HTMLInputElement>(null);
+  const focusAfterRevise = useRef(false);
   const [examples, setExamples] = useState(false);
   const personaId = useDemoStore((state) => state.personaId);
   const { messages, chatStep, interpret, validationNotes, isReplying, reply: runReply, cancelReply } = useChatReply();
@@ -63,6 +64,15 @@ export function ChatPage() {
       feed.scrollTop = feed.scrollHeight;
     }
   }, [messages, chatStep, interpret, isReplying, maturityLookup, investmentLookup]);
+
+  // '고칠게요' 뒤 입력창이 다시 나타나면 커서를 문장 끝에 둬요.
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!focusAfterRevise.current || isReplying || chatStep === 'interpret' || !input) return;
+    focusAfterRevise.current = false;
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+  }, [chatStep, isReplying]);
 
   useEffect(() => {
     if (!state?.fromMaturity) return;
@@ -234,11 +244,19 @@ export function ChatPage() {
         ) : chatStep === 'interpret' ? (
           <div className="space-y-2">
             <PrimaryButton disabled={blocked || needsConfirm} onClick={acceptIntent}>이대로 맞아요</PrimaryButton>
-            <SecondaryButton disabled={blocked} onClick={() => reply(() => {
-              reviseIntent();
-              setPickingIndex(null);
-              appendMessage('ai', '다시 말씀해 주시거나 아래에서 골라 주세요.');
-            })}>고칠게요</SecondaryButton>
+            <SecondaryButton disabled={blocked} onClick={() => {
+              const previous = useDemoStore.getState().utterance ?? '';
+              reply(() => {
+                appendMessage('user', '고칠게요');
+                reviseIntent();
+                setPickingIndex(null);
+                appendMessage('ai', previous
+                  ? '처음 말씀하신 내용을 입력창에 다시 넣어 두었어요. 틀린 금액이나 날짜만 고쳐서 보내 주세요. 처음부터 고르고 싶으시면 아래에서 골라 주세요.'
+                  : '다시 말씀해 주시거나 아래에서 골라 주세요.');
+              });
+              setDraft(previous);
+              focusAfterRevise.current = true;
+            }}>고칠게요</SecondaryButton>
           </div>
         ) : (
           <>
