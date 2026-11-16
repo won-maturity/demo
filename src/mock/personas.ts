@@ -15,7 +15,7 @@ export type Persona = {
   annualRate: number;
   autoRedeposit: boolean;
   outcome: string;
-  scenario?: { title: string; utterance: string; confirmationHint: string };
+  scenario?: { title: string; utterance: string; confirmationHint: string; revisionUtterance?: string };
 };
 
 export const DEMO_TODAY = '2026-10-22';
@@ -39,6 +39,7 @@ export const PERSONAS: Persona[] = [
       title: '학비·이사 자금 나누기',
       utterance: '3천만 원 중 반은 내년 5월 20일 아이 학비, 나머지는 이사 가서 내년 봄쯤 쓸 것 같아요',
       confirmationHint: '학비 2027.05.20 · 이사 “봄쯤”은 3월 말인지 확인한 뒤, “이대로 맞아요”를 눌러요.',
+      revisionUtterance: '이사가 내년 6월 말로 미뤄졌어요',
     },
   },
   {

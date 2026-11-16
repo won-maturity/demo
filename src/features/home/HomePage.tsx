@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { Bell, CalendarCheck, ChevronRight, CircleDollarSign, CreditCard, Globe, House, Landmark, Settings, Smartphone, Ticket, Users, Wallet, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { daysUntil } from '../../mock/personas';
+import { useDemoStore } from '../../store/useDemoStore';
+
+const formatMonthDay = (iso: string) => `${Number(iso.slice(5, 7))}/${Number(iso.slice(8, 10))}`;
 import { AccountCard } from '../banking/AccountCards';
 import { useBankingCustomer, useOpenMaturity } from '../banking/BankingShell';
 import { CurrentHeader, CurrentService, WonArt, WonCarousel, type WonSlide } from '../banking/WonCurrentUI';
@@ -23,6 +26,8 @@ const homeSlides: WonSlide[] = [
 export function HomePage() {
   const { name, persona } = useBankingCustomer();
   const openMaturity = useOpenMaturity();
+  const navigate = useNavigate();
+  const plan = useDemoStore((state) => (state.personaId === persona.id ? state.plan : null));
   const [easy, setEasy] = useState(false);
   const [hideBalance, setHideBalance] = useState(false);
   const [showPromo, setShowPromo] = useState(true);
@@ -85,10 +90,21 @@ export function HomePage() {
       </section>
       <section className="won-current-section won-home-more">
         <div className="won-carousel won-tone--sky won-maturity-entry">
-          <button type="button" className="won-carousel-slide" onClick={openMaturity}>
-            <span><strong>WON하는 만기</strong><small>{name}님 · 만기까지 {days}일</small></span>
-            <WonArt kind="house" />
-          </button>
+          {plan ? (
+            <button type="button" className="won-carousel-slide" onClick={() => navigate('/navi/plan')}>
+              <span>
+                <strong>내 만기 계획</strong>
+                <small>{plan.legs.map((leg) => `${leg.purposeLabel} ${formatMonthDay(leg.date)}`).join(' · ')}</small>
+                <small>{formatMonthDay(plan.executeOn)} 실행 예정 · 만기일 전까지 바꿀 수 있어요</small>
+              </span>
+              <WonArt kind="house" />
+            </button>
+          ) : (
+            <button type="button" className="won-carousel-slide" onClick={openMaturity}>
+              <span><strong>WON하는 만기</strong><small>{name}님 · 만기까지 {days}일</small></span>
+              <WonArt kind="house" />
+            </button>
+          )}
         </div>
         <WonCarousel slides={homeSlides} start={4} label="홈 추천 상품" />
         <h2>추천서비스</h2>

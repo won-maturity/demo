@@ -6,6 +6,7 @@ import { ChatBubble } from '../../components/ui/ChatBubble';
 import { PrimaryButton } from '../../components/ui/Buttons';
 import { Screen } from '../../components/ui/Screen';
 import { estimateHorizon, getEligibleOptions } from '../../engine/rules';
+import { describePlanChanges } from '../../engine/revise';
 import { SPLIT_PRODUCT_ID, comparePurposeSplit } from '../../engine/split';
 import { formatKoreanDate } from '../../lib/format';
 import { exampleInterest, getPersona } from '../../mock/personas';
@@ -21,23 +22,37 @@ export function ConfirmDepositPage() {
   const splitLegs = useDemoStore((state) => state.splitLegs);
   const addConsent = useDemoStore((state) => state.addConsent);
   const complete = useDemoStore((state) => state.complete);
+  const revising = useDemoStore((state) => state.revising);
+  const plan = useDemoStore((state) => state.plan);
+  const approveRevision = useDemoStore((state) => state.approveRevision);
   if (!personaId) return null;
   const persona = getPersona(personaId);
   if (selectedProductId === SPLIT_PRODUCT_ID && splitLegs && splitLegs.length >= 2) {
     const comparison = comparePurposeSplit(splitLegs, persona.principal, persona.maturityDate);
+    const editingPlan = revising && plan;
+    const changes = editingPlan ? describePlanChanges(plan.legs, splitLegs) : [];
     const approveSplit = () => {
-      addConsent('목적별로 나눈 예금 두 건의 조건을 확인하고 승인했어요.');
+      if (editingPlan) {
+        addConsent(`만기 계획 변경을 확인하고 승인했어요. (${changes.join(' / ')})`);
+        approveRevision();
+      } else {
+        addConsent('목적별로 나눈 예금 두 건의 조건을 확인하고 승인했어요.');
+        complete('split');
+      }
       addConsent('인증 완료(데모)로 실행을 대신했어요.');
-      complete('split');
       navigate('/navi/done');
     };
     return (
       <Screen
-        title="예금 승인"
-        onBack={() => navigate('/navi/options')}
+        title={editingPlan ? '계획 변경 승인' : '예금 승인'}
+        onBack={() => navigate(editingPlan ? '/navi/chat' : '/navi/options', editingPlan ? { state: { revising: true } } : undefined)}
         footer={<PrimaryButton onClick={approveSplit}>인증 완료(데모)</PrimaryButton>}
       >
-        <ChatBubble role="ai">쓰는 날에 맞춰 예금 두 건으로 나눴어요. 아래 금액과 만기만 확인하면 둘 다 진행돼요.</ChatBubble>
+        <ChatBubble role="ai">
+          {editingPlan
+            ? `만기일 전이라 예약된 계획만 바꿔요. 바뀐 내용은 ${changes.join(', ')}이에요. 확인하고 승인해 주세요.`
+            : '쓰는 날에 맞춰 예금 두 건으로 나눴어요. 아래 금액과 만기만 확인하면 둘 다 진행돼요.'}
+        </ChatBubble>
         <p className="mt-3 text-sm leading-6 text-textBody">
           나눠 맡길 때 예상 이자 · 세전 <AmountText value={comparison.splitInterest} example size="sm" />
         </p>

@@ -29,6 +29,7 @@ import { ConfirmDepositPage } from '../features/navi/ConfirmDepositPage';
 import { DonePage } from '../features/navi/DonePage';
 import { NoResponsePage } from '../features/navi/NoResponsePage';
 import { OptionsPage } from '../features/navi/OptionsPage';
+import { PlanPage } from '../features/navi/PlanPage';
 import { SummaryPage } from '../features/navi/SummaryPage';
 import { SimulatorPage } from '../features/simulator/SimulatorPage';
 import { DEFAULT_PERSONA_ID } from '../mock/personas';
@@ -123,6 +124,7 @@ export function App() {
             <Route path="/navi/no-response" element={<NoResponsePage />} />
             <Route element={<RequirePersona />}>
               <Route path="/navi/summary" element={<SummaryPage />} />
+              <Route path="/navi/plan" element={<PlanPage />} />
               <Route path="/ai-gallery/investment" element={<GalleryInvestmentPage />} />
               <Route path="/navi/chat" element={<ChatPage />} />
               <Route path="/navi/options" element={<OptionsPage />} />

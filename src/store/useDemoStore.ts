@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { inspectUtterance, maskUtterance, type GuardResult } from '../engine/guard';
-import { mockInterpret, toPurposeId, validateIntent, type InterpretResult } from '../engine/interpret';
+import { INTENT_PURPOSE_LABEL, mockInterpret, toPurposeId, validateIntent, type InterpretResult } from '../engine/interpret';
+import { describePlanChanges, revisePlan } from '../engine/revise';
 import { estimateHorizon, getEligibleOptions, horizonFromDate, type RuleId } from '../engine/rules';
-import { buildSplitPlan, type SplitLeg } from '../engine/split';
+import { SPLIT_PRODUCT_ID, buildSplitPlan, type SplitLeg } from '../engine/split';
 import { formatDotDate, formatKoreanDate, formatManWon, formatWon } from '../lib/format';
 import type { PurposeId, TimingId } from '../mock/chatScripts';
 import { DEMO_TODAY, getPersona, type PersonaId } from '../mock/personas';
@@ -13,10 +14,19 @@ export type ChatMessage = {
   id: string;
   role: 'ai' | 'user';
   text: string;
-  kind?: 'maturity-lookup' | 'investment-lookup';
+  kind?: 'maturity-lookup' | 'investment-lookup' | 'plan';
 };
 
-export type ChatStep = 'timing' | 'purpose' | 'date' | 'interpret' | 'closing' | 'handoff';
+export type ChatStep = 'timing' | 'purpose' | 'date' | 'interpret' | 'closing' | 'handoff' | 'revise';
+
+/** 승인 후 만기일에 실행될 예약 계획. 만기일 전까지는 다시 들어와 고칠 수 있다. */
+export type MaturityPlan = {
+  legs: SplitLeg[];
+  approvedAt: string;
+  executeOn: string;
+};
+
+export type PlanChange = { at: string; lines: string[] };
 
 export type InvestFlags = {
   profile: boolean;
@@ -67,7 +77,14 @@ type DemoState = {
   intentConfirmed: boolean;
   confirmedAt: string | null;
   splitLegs: SplitLeg[] | null;
+  plan: MaturityPlan | null;
+  planHistory: PlanChange[];
+  revising: boolean;
   selectPersona: (id: PersonaId) => void;
+  startPlanRevision: () => void;
+  submitRevision: (text: string) => void;
+  confirmRevision: () => boolean;
+  approveRevision: () => void;
   maturityLookup: LookupState<MaturityAccount>;
   investmentLookup: LookupState<InvestmentProfile>;
   lookupFailureOnce: 'none' | 'maturity' | 'investment';
@@ -159,10 +176,18 @@ export const useDemoStore = create<DemoState>((set, get) => ({
   intentConfirmed: false,
   confirmedAt: null,
   splitLegs: null,
+  plan: null,
+  planHistory: [],
+  revising: false,
   selectPersona: (id) => {
     const persona = getPersona(id);
     messageSeq = 0;
+    const samePersona = get().personaId === id;
     set({
+      // 같은 고객으로 다시 시작해도 이미 승인한 예약 계획은 남겨 둬요.
+      plan: samePersona ? get().plan : null,
+      planHistory: samePersona ? get().planHistory : [],
+      revising: false,
       personaId: id,
       maturityLookup: { status: 'idle' },
       investmentLookup: { status: 'idle' },
@@ -234,6 +259,7 @@ export const useDemoStore = create<DemoState>((set, get) => ({
       interpret: '앞서 말씀하신 용도와 날짜가 맞는지 확인해 주세요.',
       closing: '앞서 말씀해 주신 용도에 맞는 선택지를 확인해 보세요.',
       handoff: '지금까지 상담한 내용을 전문가에게 이어드릴게요.',
+      revise: '바뀐 날짜나 금액을 말씀해 주세요.',
     };
     get().appendMessage('ai', nextQuestion[get().chatStep]);
   },
@@ -315,7 +341,15 @@ export const useDemoStore = create<DemoState>((set, get) => ({
   },
   complete: (via, productId) => {
     if (via === 'split') {
-      set({ completion: { type: 'product', productId: 'super-deposit', via }, selectedProductId: 'purpose-split' });
+      const legs = get().splitLegs;
+      const personaId = get().personaId;
+      set({
+        completion: { type: 'product', productId: 'super-deposit', via },
+        selectedProductId: 'purpose-split',
+        plan: legs && personaId
+          ? { legs, approvedAt: `${DEMO_TODAY} 09:41`, executeOn: getPersona(personaId).maturityDate }
+          : get().plan,
+      });
       return;
     }
     const id = productId ?? get().selectedProductId;
@@ -436,7 +470,80 @@ export const useDemoStore = create<DemoState>((set, get) => ({
       intentConfirmed: false,
       confirmedAt: null,
       splitLegs: null,
-      chatStep: 'timing',
+      chatStep: get().revising ? 'revise' : 'timing',
+    });
+  },
+  startPlanRevision: () => {
+    const { personaId, plan } = get();
+    if (!personaId || !plan) return;
+    const persona = getPersona(personaId);
+    messageSeq = 0;
+    set({
+      revising: true,
+      messages: [
+        { id: 'revise-1', role: 'ai', text: `${persona.name}님의 만기 계획을 다시 볼게요.` },
+        // 채팅 첫 인사 영역은 두 번째 메시지를 보여 줘요.
+        { id: 'revise-2', role: 'ai', text: `${formatDotDate(plan.executeOn)}에 실행될 만기 계획을 불러왔어요. 바뀐 날짜나 금액을 편하게 말씀해 주세요.` },
+        { id: 'revise-plan', role: 'ai', text: '', kind: 'plan' },
+        { id: 'revise-3', role: 'ai', text: `만기일 전이라 지금 바꾸셔도 중도해지 손해가 없어요. 예를 들어 “이사가 6월 말로 미뤄졌어요”처럼 말씀해 주세요.` },
+      ],
+      chatStep: 'revise',
+      utterance: null,
+      maskedUtterance: null,
+      guard: null,
+      interpret: null,
+      validationNotes: [],
+      intentConfirmed: false,
+      confirmedAt: null,
+      splitLegs: null,
+    });
+  },
+  submitRevision: (text) => {
+    const trimmed = text.trim();
+    const { personaId, plan } = get();
+    if (!trimmed || !personaId || !plan) return;
+    const verdict = inspectUtterance(trimmed);
+    if (!verdict.ok) {
+      get().appendMessage('ai', verdict.message);
+      return;
+    }
+    const persona = getPersona(personaId);
+    get().appendMessage('user', trimmed);
+    const revision = revisePlan(plan.legs, trimmed, DEMO_TODAY, persona.principal, plan.executeOn);
+    if (!revision) {
+      get().appendMessage('ai', '바뀐 내용을 찾지 못했어요. “학비”나 “이사”와 함께 새 날짜나 금액을 말씀해 주세요.');
+      return;
+    }
+    const checked = validateIntent({ items: revision.items, totalAmount: persona.principal, guard: verdict }, persona.principal);
+    set({
+      guard: verdict,
+      utterance: trimmed,
+      maskedUtterance: maskUtterance(trimmed),
+      interpret: checked.result,
+      validationNotes: [...revision.notes, ...checked.fixes],
+      intentConfirmed: false,
+      chatStep: 'interpret',
+    });
+    const changedLabels = revision.changed.map((purpose) => INTENT_PURPOSE_LABEL[purpose]).join('·');
+    get().appendMessage('ai', `${changedLabels} 계획을 이렇게 바꿔 봤어요. 바뀐 부분이 맞는지 확인해 주세요.`);
+  },
+  confirmRevision: () => {
+    const current = get().interpret;
+    if (!current || current.items.some((item) => item.certainty !== 'CONFIRMED')) return false;
+    const legs = buildSplitPlan(current.items);
+    if (!legs) return false;
+    set({ splitLegs: legs, selectedProductId: SPLIT_PRODUCT_ID, intentConfirmed: true, confirmedAt: `${DEMO_TODAY} 09:41` });
+    return true;
+  },
+  approveRevision: () => {
+    const { plan, splitLegs } = get();
+    if (!plan || !splitLegs) return;
+    const lines = describePlanChanges(plan.legs, splitLegs);
+    set({
+      plan: { ...plan, legs: splitLegs },
+      planHistory: [...get().planHistory, { at: `${DEMO_TODAY} 09:41`, lines }],
+      revising: false,
+      completion: { type: 'product', productId: 'super-deposit', via: 'split' },
     });
   },
   showToast: (message) => {
