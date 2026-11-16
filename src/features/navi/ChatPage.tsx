@@ -48,7 +48,13 @@ export function ChatPage() {
   const maturityLookup = useDemoStore((state) => state.maturityLookup);
   const investmentLookup = useDemoStore((state) => state.investmentLookup);
   const maturityEntry = state?.fromMaturity === true || messages.some((message) => message.kind === 'maturity-lookup');
-  const [draft, setDraft] = useState(() => typeof state?.draft === 'string' ? state.draft : '');
+  const [draft, setDraft] = useState(() => {
+    if (typeof state?.draft === 'string') return state.draft;
+    // 시나리오가 있는 고객은 아직 말하지 않았으면 시나리오 발화를 입력창에 미리 채워요.
+    const { personaId: id, messages: current } = useDemoStore.getState();
+    if (!id || current.some((message) => message.role === 'user')) return '';
+    return getPersona(id).scenario?.utterance ?? '';
+  });
   const [pickingIndex, setPickingIndex] = useState<number | null>(null);
 
   useEffect(() => {
